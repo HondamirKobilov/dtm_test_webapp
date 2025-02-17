@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imtihon Markazi</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+        <h1 class="title">Imtihon Markazi</h1>
+        <div class="profile-icon">
+            <img src="{% static 'images/profile-icon.png' %}" alt="Profil">
+        </div>
+    </header>
+
+    <!-- Diagnostikalar Ro‘yxati -->
+    <main class="container" id="diagnostika-list">
+        <p class="empty-message">📌 Hozircha diagnostikalar mavjud emas.</p>
+    </main>
+
+    <!-- Imtihonni boshlash sahifasi (avval yashirin holatda) -->
+    <main class="container hidden" id="exam-container">
+        <h2 class="exam-title">Imtihonni boshlash</h2>
+
+        <div class="form-group">
+            <label for="subject1">1-Fan (mutaxassislik)</label>
+            <select id="subject1"></select>  <!-- Optionlar JavaScript orqali yuklanadi -->
+        </div>
+        <div class="form-group">
+            <label for="subject2">2-Fan (mutaxassislik)</label>
+            <select id="subject2"></select>  <!-- Optionlar JavaScript orqali yuklanadi -->
+        </div>
+        <div class="form-group">
+            <label for="mandatory">Majburiy fanlar</label>
+            <select id="mandatory" disabled>
+                <option>Ona tili, Tarix, Matematika</option>
+            </select>
+        </div>
+        <div class="form-group" id="foreign-language-container" style="display: none;">
+            <label for="foreign-language">Chet tilini tanlang</label>
+            <select id="foreign-language"></select>
+        </div>
+
+        <button class="start-button">Imtihonni boshlash</button>
+        <button class="back-button" id="back-to-list">← Ortga</button>
+    </main>
+    <!-- Test sahifasi (Yangi qo‘shildi) -->
+    <main class="container hidden" id="test-container">
+        <h2 class="exam-title">Testlar</h2>
+        <div id="questions"></div>
+        <button class="back-button" id="back-to-exam">← Ortga</button>
+    </main>
+
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

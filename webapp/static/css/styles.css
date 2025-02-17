@@ -1,0 +1,133 @@
+/* Umumiy sozlamalar */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #007BFF;
+    color: white;
+    padding: 15px 20px;
+}
+
+.navbar .title {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.profile-icon img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Asosiy container */
+.container {
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+/* Diagnostika kartalari */
+.exam-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.exam-card h3 {
+    margin: 0 0 10px;
+}
+
+/* Sana va abituriyentlar sonini bitta qatorda chiqarish */
+.exam-info {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.divider {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Tugmalar */
+.start-button, .back-button {
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    padding: 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 15px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+}
+
+.start-button:hover {
+    background-color: #0056b3;
+}
+
+.back-button {
+    background-color: #d1d1d1;
+    color: black;
+}
+
+.back-button:hover {
+    background-color: #aaa;
+}
+
+/* Yangi sahifa (imtihon boshlash sahifasi) */
+.hidden {
+    display: none;
+}
+
+/* **Imtihonni boshlash UI** */
+.exam-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Form guruhlari */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.form-group select:disabled {
+    background-color: #e9ecef;
+}
+
