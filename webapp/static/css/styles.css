@@ -131,3 +131,195 @@ body {
     background-color: #e9ecef;
 }
 
+/* Savollarni tartib bilan chiqarish */
+.exam-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* Savol matni */
+.exam-card h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Savol rasmi */
+.exam-card img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+/* Variantlar ro‘yxati */
+.answers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Har bir variant */
+.answers label {
+    display: flex;
+    align-items: center;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.answers label:hover {
+    background: #e9ecef;
+}
+
+/* Radio tugmalar */
+.answers input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+/* Testni boshlash tugmasi */
+.start-button, .submit-button {
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 15px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.start-button:hover, .submit-button:hover {
+    background-color: #0056b3;
+}
+
+/* Ortga tugmasi */
+.back-button {
+    background-color: #d1d1d1;
+    color: black;
+}
+
+.back-button:hover {
+    background-color: #aaa;
+}
+/* Test tugmalari stilini yaxshilash */
+#test-navigation {
+    text-align: center;
+    margin-top: 20px;
+    padding: 7px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+
+#test-buttons {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(30px, 1fr)); /* Tugmalar o'lchami moslashuvchan bo‘lsin */
+    gap: 5px; /* Tugmalar orasidagi masofa */
+    justify-content: center;
+    align-items: center;
+    max-width: 600px; /* Maksimal uzunlik */
+    margin: 10px auto; /* Markazga chiqarish */
+}
+
+.test-nav-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #95b6d8;
+    background: white;
+    color: black;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: background 0.3s ease, text-decoration 0.3s ease;
+}
+
+.test-nav-btn:hover {
+    background: #9ec2ef;
+    color: black;
+    text-decoration: underline;
+}
+
+#test-footer {
+    margin-top: 40px; /* Footer yuqoridagi tugmalardan uzoqroq bo‘lishi uchun */
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    text-align: center;
+    background: #f8f8f8;
+}
+
+.test-info {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+.test-info h3 {
+    font-size: 24px;
+    margin: 0;
+}
+
+/* Qolgan vaqt har doim yuqorida yopishib turishi */
+#sticky-timer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.finish-button {
+    background: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.finish-button:hover {
+    background: #0056b3;
+}
+
+#sticky-timer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none; /* Defaultda yashirilgan bo‘lsin */
+}

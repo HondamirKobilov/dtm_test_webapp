@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Diagnostika, Subject, Question
-from .serializers import QuestionSerializer
+from .models import Diagnostika, Subject, Question, Answer
+from .serializers import QuestionSerializer, AnswerSerializer
 
 
 def home(request):
@@ -46,9 +46,52 @@ class SubjectListAPIView(APIView):
 
 
 class DiagnostikaTestAPIView(APIView):
-    def get(self, request, diagnostika_id, *args, **kwargs):
-        diagnostika = get_object_or_404(Diagnostika, id=diagnostika_id)
-        questions = Question.objects.filter(diagnostika=diagnostika).order_by('id')
+    def post(self, request, diagnostika_id, *args, **kwargs):
+        try:
+            data = request.data
+            subject1 = data.get("subject1")
+            subject2 = data.get("subject2")
 
-        serializer = QuestionSerializer(questions, many=True)
-        return Response({"status": "success", "questions": serializer.data}, status=200)
+            if not subject1 or not subject2:
+                return Response({"status": "error", "message": "Ikkita fan tanlanishi kerak!"}, status=400)
+
+            # **1-Fan uchun testlar**
+            questions_subject1 = Question.objects.filter(
+                diagnostika_id=diagnostika_id, subject__name=subject1, is_mandatory=False
+            ).order_by('?')[:30]  # ❗ 30 ta tasodifiy test
+
+            # **2-Fan uchun testlar**
+            questions_subject2 = Question.objects.filter(
+                diagnostika_id=diagnostika_id, subject__name=subject2, is_mandatory=False
+            ).order_by('?')[:30]  # ❗ 30 ta tasodifiy test
+
+            # **Majburiy fanlar uchun testlar**
+            compulsory_subjects = ["Ona tili", "Tarix", "Matematika"]
+            compulsory_questions = Question.objects.filter(
+                diagnostika_id=diagnostika_id, subject__name__in=compulsory_subjects, is_mandatory=True
+            ).order_by("subject__name")
+
+            # **Barcha savollarni olish va ularning javoblarini qo‘shish**
+            all_questions = []
+
+            def format_questions(title, question_list):
+                """Har bir fan uchun nomini va testlarini chiqarish"""
+                if question_list:
+                    all_questions.append({"subject_name": title, "questions": []})
+                    for question in question_list:
+                        question_data = QuestionSerializer(question).data
+                        answers = Answer.objects.filter(question_id=question.id)
+                        question_data["answers"] = AnswerSerializer(answers, many=True).data
+                        all_questions[-1]["questions"].append(question_data)
+
+            format_questions(subject1, questions_subject1)
+            format_questions(subject2, questions_subject2)
+
+            for subject in compulsory_subjects:
+                questions = compulsory_questions.filter(subject__name=subject)
+                format_questions(subject, questions)
+
+            return Response({"status": "success", "questions": all_questions}, status=200)
+
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=500)

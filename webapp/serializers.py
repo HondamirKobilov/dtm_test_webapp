@@ -15,10 +15,10 @@ class DiagnostikaSerializer(serializers.ModelSerializer):
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ['id', 'text', 'is_correct']
+        fields = ['id', 'text', 'is_correct']  # is_correct ni qaytarmaslik kerak bo‘lsa, olib tashlang
 
 class QuestionSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer(many=True, read_only=True)
+    answers = AnswerSerializer(many=True, read_only=True)  # Har bir savolga tegishli variantlar
 
     class Meta:
         model = Question
