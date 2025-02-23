@@ -1,20 +1,21 @@
 function fixLatexFormulas(latex) {
     if (!latex) return "";
-        return latex
-            .replace(/–/g, "-") // En Dash → "--"
-            .replace(/’/g, "'")  // Right single quote → "'"
-            .replace(/“/g, "``") // Opening quote → ``
-            .replace(/”/g, "''") // Closing quote → ''
-            .replace(/…/g, "\\dots") // Ellipsis → \dots
-            .replace(/\u00A0/g, " ") // Non-breaking space → Normal space
-            .replace(/⋅/g, " \\cdot ")      // Dot `⋅` ni `\cdot` bilan almashtirish
-            .replace(/:/g, " \\div ")
-            .replace(/\u2022/g, " \\cdot ")
-            .replace(/\\div/g, " : ")
-            .replace(/\\bullet/g, " \\cdot ");
-
+    return latex
+        .replace(/–/g, "-") // En Dash → "-"
+        .replace(/’/g, "'")  // Right single quote → "'"
+        .replace(/“/g, "``") // Opening quote → ``
+        .replace(/”/g, "''") // Closing quote → ''
+        .replace(/…/g, "\\dots") // Ellipsis → \dots
+        .replace(/\u00A0/g, " ") // Non-breaking space → Normal space
+        .replace(/⋅/g, " \\cdot ") // `⋅` ni `\cdot` bilan almashtirish
+        .replace(/:/g, " \\div ") // ":" ni `\div` bilan almashtirish
+        .replace(/\u2022/g, " \\cdot ") // Bullet point ni `\cdot` bilan almashtirish
+        .replace(/\\div/g, " : ") // Agar noto‘g‘ri `\div` kelgan bo‘lsa almashtirish
+        .replace(/\\bullet/g, " \\cdot ") // Bullet ni almashtirish
+        .replace(/\$(.*?)\$/g, "\\($1\\)") // `$...$` ni inline MathJax formatiga o'tkazish
+        .replace(/\$\$(.*?)\$\$/g, "\\[$1\\]"); // `$$...$$` ni block MathJax formatiga o'tkazish
 }
-
+let selectedSubjects = {};
 document.addEventListener("DOMContentLoaded", function () {
     let diagnostikaContainer = document.getElementById("diagnostika-list");
     let examContainer = document.getElementById("exam-container");
@@ -33,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 data.diagnostikalar.forEach(diagnostika => {
                     let examCard = document.createElement("div");
-                    examCard.className = "exam-card";
+                    examCard.className = "exam-carta";
                     examCard.innerHTML = `
                         <h3>${diagnostika.name}</h3>
                         <p class="exam-info">
@@ -68,7 +69,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     fetchSubjects();
-
     startExamButton.addEventListener("click", function () {
         let diagnostikaId = localStorage.getItem("diagnostika_id");
         let subject1 = document.getElementById("subject1").value;
@@ -88,7 +88,8 @@ document.addEventListener("DOMContentLoaded", function () {
             subject1: subject1,
             subject2: subject2
         };
-
+        selectedSubjects.subject1 = subject1;
+        selectedSubjects.subject2 = subject2;
         // ✅ Chet tili qo‘shilishi
         if (document.getElementById("foreign-language-container").style.display === "block" && foreignLanguage) {
             requestData.foreign_language = foreignLanguage;
@@ -105,31 +106,53 @@ document.addEventListener("DOMContentLoaded", function () {
                 questionsDiv.innerHTML = "";
 
                 // ✅ FAN NOMLARINI CHIQARISH
-                let startNumber = 1; // ✅ Testlarni 1dan 90gacha to‘g‘ri tartibda raqamlash uchun
+                let startNumber = 1; // Testlarni 1 dan 90 gacha raqamlash
                 data.questions.forEach(subjectData => {
-                    let subjectTitle = document.createElement("h2");
-                    subjectTitle.textContent = subjectData.subject_name;
-                    subjectTitle.classList.add("exam-title");
-                    questionsDiv.appendChild(subjectTitle);
+                // 🔹 **Fan nomini chiqaramiz**
+                let subjectTitle = document.createElement("h2");
+                subjectTitle.textContent = subjectData.subject_name;
+                subjectTitle.classList.add("exam-title");
+                questionsDiv.appendChild(subjectTitle);
+                subjectData.questions.forEach((question) => {
+                    let questionBlock = document.createElement("div");
+                    questionBlock.className = "exam-card";
+                    questionBlock.id = `q${startNumber}`; // Har bir savolga ID qo‘shiladi (q1, q2, ..., q90)
 
-                    subjectData.questions.forEach((question) => {
-                        let questionBlock = document.createElement("div");
-                        questionBlock.className = "exam-card";
-                        questionBlock.innerHTML = `
-                            <p>${startNumber++}. ${fixLatexFormulas(question.question_text)}</p> 
-                            ${question.image ? `<img src="${question.image}" alt="Rasm" width="50%">` : ""}
-                            <div class="answers">
-                                ${question.answers.map(answer => `
-                                    <label>
-                                        <input type="radio" name="q${question.id}" value="${answer.id}">
-                                        ${fixLatexFormulas(answer.text)}
-                                    </label>
-                                `).join("")}
-                            </div>
-                        `;
-                        questionsDiv.appendChild(questionBlock);
-                    });
+                    questionBlock.innerHTML = `
+                        <p><strong>${startNumber}.</strong> ${fixLatexFormulas(question.question_text)}</p> 
+                        ${question.image ? `<img src="${question.image}" alt="Rasm" width="50%">` : ""}
+                        <div class="answers">
+                            ${question.answers.map(answer => `
+                                <label>
+                                    <input type="radio" name="q${startNumber}" value="${answer.id}">
+                                    ${fixLatexFormulas(answer.text)}
+                                </label>
+                            `).join("")}
+                        </div>
+                    `;
+
+                    questionsDiv.appendChild(questionBlock);
+                    startNumber++; // **Test raqamini oshiramiz (1,2,3,...,90)**
                 });
+            });
+
+            // ✅ **Variant tanlanganda pastdagi tugma yashil bo‘lishi**
+            document.querySelectorAll(".answers input[type='radio']").forEach(radio => {
+                radio.addEventListener("change", function () {
+                    let questionNumber = this.name.replace("q", ""); // Masalan: q5 -> 5
+                    let relatedButton = document.querySelector(`.test-nav-btn[data-question="q${questionNumber}"]`);
+
+                    // **Avval barcha tugmalardan "selected" klassini olib tashlaymiz**
+                    document.querySelectorAll(".test-nav-btn").forEach(btn => {
+                        btn.classList.remove("selected");
+                    });
+
+                    if (relatedButton) {
+                        relatedButton.classList.add("selected"); // ✅ Tugmaning rangi yashil bo‘ladi
+                    }
+                });
+            });
+
                 MathJax.typesetPromise().then(() => {
                     console.log("MathJax yangilandi");
                 }).catch((err) => console.error("MathJax xatolik berdi:", err));
@@ -140,6 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 alert("Savollarni yuklashda xatolik yuz berdi!");
             }
+
         })
         .catch(error => {
             console.error("Xatolik:", error);
@@ -147,6 +171,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
 
 // ✅ SubjectsMapping ishlashi uchun yangilangan funksiya
 let subjectsMapping = {
@@ -214,9 +240,6 @@ function updateSecondSubject() {
     checkForeignLanguage();
 }
 
-
-
-// ✅ Chet tili tekshirish
 function checkForeignLanguage() {
     let subject1 = document.getElementById("subject1").value;
     let subject2 = document.getElementById("subject2").value;
@@ -243,13 +266,14 @@ function checkForeignLanguage() {
         foreignLanguageSelect.innerHTML = "";
     }
 }
+let testStartTime = null;
 document.addEventListener("DOMContentLoaded", function () {
-    let startTime = 3 * 60 * 60; // 3 soat (sekundlarda)
+    let startTime = 3 * 60 * 60; // ⏳ 3 soat (sekundlarda)
     let timeElement = document.getElementById("remaining-time");
     let stickyTimer = document.getElementById("sticky-timer");
     let participantElement = document.getElementById("participant-count");
     let testButtonsDiv = document.getElementById("test-buttons");
-
+    testStartTime = Date.now();
     function formatTime(seconds) {
         let hours = Math.floor(seconds / 3600);
         let minutes = Math.floor((seconds % 3600) / 60);
@@ -258,14 +282,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateTimer() {
-        if (startTime > 0) startTime -= 5; // ⏳ Har 5 sekundda 5 soniya kamaytirish
+        if (startTime > 0) startTime -= 1; // ⏳ Har 5 sekundda 5 soniya kamaytirish
         let formattedTime = formatTime(startTime);
         timeElement.textContent = formattedTime;
         stickyTimer.textContent = formattedTime; // ✅ Sticky taymer ham yangilanadi
     }
 
     // **Har 5 sekundda ikkalasini ham yangilash**
-    setInterval(updateTimer, 5000);
+    setInterval(updateTimer, 1000);
 
     fetch("/api/diagnostikas/")
         .then(response => response.json())
@@ -275,10 +299,6 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => console.error("Xatolik:", error));
 
-    document.querySelector(".finish-button").addEventListener("click", function () {
-        alert("Test yakunlandi!");
-    });
-
     // 🔥 Test tugmachalarini yaratish
     testButtonsDiv.innerHTML = "";
     for (let i = 1; i <= 90; i++) {
@@ -286,14 +306,38 @@ document.addEventListener("DOMContentLoaded", function () {
         button.textContent = i;
         button.classList.add("test-nav-btn");
         button.setAttribute("data-question", `q${i}`);
+
         button.addEventListener("click", function () {
             let targetQuestion = document.getElementById(this.getAttribute("data-question"));
             if (targetQuestion) {
-                targetQuestion.scrollIntoView({ behavior: "smooth" });
+                targetQuestion.scrollIntoView({ behavior: "smooth", block: "center" });
             }
         });
+
         testButtonsDiv.appendChild(button);
     }
+    // ✅ **Variant tanlanganda mos keluvchi tugmani ko‘k qilish**
+    function updateButtonColors() {
+        document.querySelectorAll(".test-nav-btn").forEach(button => {
+            button.classList.remove("selected"); // 🔄 Avvalgi tanlangan tugmalardan "selected" klassini olib tashlaymiz
+        });
+
+        document.querySelectorAll(".exam-card input[type='radio']:checked").forEach(radio => {
+            let questionNumber = radio.name.replace("q", ""); // Masalan: q5 -> 5
+            let relatedButton = document.querySelector(`.test-nav-btn[data-question="q${questionNumber}"]`);
+
+            if (relatedButton) {
+                relatedButton.classList.add("selected"); // ✅ **Selected klass qo‘shiladi**
+            }
+        });
+    }
+
+    // ✅ **Variant tanlanganda ishlaydi**
+    document.addEventListener("change", function (event) {
+        if (event.target.matches(".exam-card input[type='radio']")) {
+            updateButtonColors();
+        }
+    });
 
     // **Skroll qilinganda sticky timer ko‘rinishi**
     window.addEventListener("scroll", function () {
@@ -305,22 +349,88 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    let finishButton = document.querySelector(".finish-button");
+    let finishTestModal = document.getElementById("finishTestModal");
+    let confirmFinish = document.getElementById("confirmFinish");
+    let cancelFinish = document.getElementById("cancelFinish");
+    let testResultModal = document.getElementById("testResultModal");
+    let exitTest = document.getElementById("exitTest");
 
-//
-// document.addEventListener("DOMContentLoaded", function () {
-//     let stickyTimer = document.getElementById("sticky-timer");
-//     let mainTimer = document.getElementById("remaining-time"); // Pastdagi taymer
-//
-//     window.addEventListener("scroll", function () {
-//         if (window.scrollY > 100) {
-//             stickyTimer.style.display = "block"; // Skroll qilinganda chiqadi
-//         } else {
-//             stickyTimer.style.display = "none"; // Yuqorida bo‘lsa yashirin qoladi
-//         }
-//     });
-//
-//     // **Har 5 sekundda taymerni yangilash**
-//     setInterval(() => {
-//         stickyTimer.textContent = mainTimer.textContent;
-//     }, 5000);
-// });
+    let testStartTime = Date.now(); // ✅ Test boshlanish vaqtini saqlash
+
+    finishButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        finishTestModal.style.display = "flex";
+    });
+
+    cancelFinish.addEventListener("click", function () {
+        finishTestModal.style.display = "none";
+    });
+
+    confirmFinish.addEventListener("click", function () {
+        finishTestModal.style.display = "none"; // ❌ Modalni yopamiz
+        testResultModal.style.display = "flex"; // ✅ Natija oynasini ochamiz
+        checkTestResults(); // ✅ Natijalarni tekshirish
+    });
+
+    exitTest.addEventListener("click", function () {
+        testResultModal.style.display = "none";
+    });
+
+    function checkTestResults() {
+        let endTime = Date.now();
+        let totalTime = Math.floor((endTime - testStartTime) / 1000);
+        let minutes = Math.floor(totalTime / 60);
+        let seconds = totalTime % 60;
+        document.getElementById("spent-time").textContent = `${minutes}m ${seconds}s`;
+
+        let selectedAnswers = [];
+        let totalQuestions = document.querySelectorAll(".exam-card").length;
+
+        document.querySelectorAll(".exam-card").forEach((questionBlock, index) => {
+            let questionId = questionBlock.getAttribute("data-question-id");
+            let selectedOption = questionBlock.querySelector("input[type='radio']:checked");
+            if (selectedOption) {
+                selectedAnswers.push({
+                    question_id: parseInt(questionId),  // Savol ID si
+                    answer_id: parseInt(selectedOption.value),  // Variant ID si
+                    order_number: index + 1  // Tartib raqami (1 dan 90 gacha)
+                });
+            }
+        });
+
+        // ✅ Foydalanuvchining tanlagan javoblarini serverga yuborish
+        fetch("/api/check-answers/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ answers: selectedAnswers, total_questions: totalQuestions })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                document.getElementById("correct-answers").textContent = `${data.correct_count} / ${totalQuestions}`;
+                document.getElementById("percentage").textContent = `${data.percentage}%`;
+                document.getElementById("total-score").textContent = data.total_score;
+                 console.log("Xondamir1", selectedSubjects.subject1)
+                console.log("Xondamir2", selectedSubjects.subject2)
+                document.getElementById("subject1-name").textContent = selectedSubjects.subject1 || "Fan 1";
+                document.getElementById("subject2-name").textContent = selectedSubjects.subject2|| "Fan 2";
+                document.getElementById("subject1-correct").textContent = `${data.subject_scores?.fan_1?.correct || 0} ta`;
+                document.getElementById("subject2-correct").textContent = `${data.subject_scores?.fan_2?.correct || 0} ta`;
+                document.getElementById("mandatory-correct").textContent = `${data.subject_scores?.mandatory?.correct || 0} ta`;
+
+                document.getElementById("subject1-score").textContent = `${data.subject_scores?.fan_1?.score || 0} ball`;
+                document.getElementById("subject2-score").textContent = `${data.subject_scores?.fan_2?.score || 0} ball`;
+                document.getElementById("mandatory-score").textContent = `${data.subject_scores?.mandatory?.score || 0} ball`;
+
+            } else {
+                alert("Xatolik: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Xatolik:", error);
+            alert("Natijalarni tekshirishda xatolik yuz berdi!");
+        });
+    }
+});

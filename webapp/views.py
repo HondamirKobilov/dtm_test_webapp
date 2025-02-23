@@ -95,3 +95,67 @@ class DiagnostikaTestAPIView(APIView):
 
         except Exception as e:
             return Response({"status": "error", "message": str(e)}, status=500)
+
+
+class CheckAnswersAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            answers = data.get("answers", [])
+            total_questions = data.get("total_questions", 0)
+
+            if not total_questions:
+                return Response({"status": "error", "message": "Savollar soni yetishmayapti!"}, status=400)
+
+            # ✅ Har bir fan uchun to‘g‘ri javoblar sonini alohida hisoblaymiz
+            correct_count_1 = 0  # 1-fan
+            correct_count_2 = 0  # 2-fan
+            correct_count_mandatory = 0  # Majburiy fanlar
+
+            for answer in answers:
+                answer_id = answer["answer_id"]
+                order_number = answer.get("order_number")  # 📌 Testning tartib raqamini olish
+
+                # 📌 Foydalanuvchi tanlagan variantni bazadan topamiz
+                selected_answer = Answer.objects.filter(id=answer_id).first()
+
+                if selected_answer and selected_answer.is_correct:
+                    # 📌 Tartib raqam asosida fanlarni ajratamiz
+                    if 1 <= order_number <= 30:
+                        correct_count_1 += 1  # 1-fan (3.1 ball)
+                    elif 31 <= order_number <= 60:
+                        correct_count_2 += 1  # 2-fan (2.1 ball)
+                    elif 61 <= order_number <= 90:
+                        correct_count_mandatory += 1  # Majburiy fanlar (1.1 ball)
+
+            incorrect_count = total_questions - (correct_count_1 + correct_count_2 + correct_count_mandatory)
+
+            # 📌 Ballarni hisoblash
+            score_1 = round(correct_count_1 * 3.1, 1)
+            score_2 = round(correct_count_2 * 2.1, 1)
+            score_mandatory = round(correct_count_mandatory * 1.1, 1)
+
+            total_score = round(score_1 + score_2 + score_mandatory, 1)
+
+            # 📌 Foizni hisoblash
+            percentage = round(((correct_count_1 + correct_count_2 + correct_count_mandatory) / total_questions) * 100, 1) if total_questions > 0 else 0
+
+            return Response({
+                "status": "success",
+                "correct_count": correct_count_1 + correct_count_2 + correct_count_mandatory,
+                "incorrect_count": incorrect_count,
+                "total_questions": total_questions,
+                "percentage": percentage,
+                "total_score": total_score,
+                "subject_scores": {
+                    "fan_1": {"correct": correct_count_1, "score": score_1},
+                    "fan_2": {"correct": correct_count_2, "score": score_2},
+                    "mandatory": {"correct": correct_count_mandatory, "score": score_mandatory},
+                }
+            }, status=200)
+
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=500)
+
+
+

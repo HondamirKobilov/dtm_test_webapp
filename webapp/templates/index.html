@@ -6,13 +6,24 @@
     <title>Imtihon Markazi</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
+
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            svg: { fontCache: 'global' }
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                tags: 'none',
+                maxBuffer: 10000
+            },
+            svg: {
+                fontCache: 'global',
+                scale: 0.9
+            }
         };
     </script>
-    <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
@@ -20,7 +31,7 @@
     <header class="navbar">
         <h1 class="title">Imtihon Markazi</h1>
         <div class="profile-icon">
-            <img src="{% static 'images/profile-icon.png' %}" alt="Profil">
+{#            <img src="{% static 'images/profile-icon.png' %}" alt="Profil">#}
         </div>
     </header>
 
@@ -29,10 +40,9 @@
         <p class="empty-message">📌 Hozircha diagnostikalar mavjud emas.</p>
     </main>
 
-    <!-- Imtihonni boshlash sahifasi (avval yashirin holatda) -->
+    <!-- Imtihonni boshlash sahifasi -->
     <main class="container hidden" id="exam-container">
         <h2 class="exam-title">Imtihonni boshlash</h2>
-
         <div class="form-group">
             <label for="subject1">1-Fan (mutaxassislik)</label>
             <select id="subject1"></select>  
@@ -51,7 +61,6 @@
             <label for="foreign-language">Chet tilini tanlang</label>
             <select id="foreign-language"></select>
         </div>
-
         <button class="start-button">Imtihonni boshlash</button>
         <button class="back-button" id="back-to-list">← Ortga</button>
     </main>
@@ -79,6 +88,83 @@
             <button class="finish-button">Testni yakunlash</button>
         </div>
     </main>
+
+    <!-- 1-Modal: Testni tasdiqlash -->
+    <div id="finishTestModal" class="modal">
+        <div class="modal-content">
+            <h2>Testni yakunlaysizmi?</h2>
+            <div class="modal-actions">
+                <button id="cancelFinish" class="cancel-button">Yo‘q</button>
+                <button id="confirmFinish" class="confirm-button">Ha, yakunlayman</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2-Modal: Test natijalari -->
+    <!-- 2-Modal: Test natijalari -->
+    <div id="testResultModal" class="modal">
+        <div class="modal-content result-content">
+            <h2>Testlar natijalari</h2>
+    
+            <!-- Natijalar jadvali (Har biri alohida ustun) -->
+            <div class="result-info">
+                <table class="summary-table">
+                    <tr>
+                        <th>Sarflangan vaqt</th>
+                        <th>To‘g‘ri javoblar</th>
+                        <th>Natija %</th>
+                        <th>Ball</th>
+                    </tr>
+                    <tr>
+                        <td><span id="spent-time">0 min.</span></td>
+                        <td><span id="correct-answers">0 / 90</span></td>
+                        <td><span id="percentage">0%</span></td>
+                        <td><span id="total-score">0</span></td>
+                    </tr>
+                </table>
+            </div>
+    
+            <!-- Fanlar bo‘yicha natijalar -->
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th><span id="subject1-name">Fan 1</span></th>
+                        <th><span id="subject2-name">Fan 2</span></th>
+                        <th>Majburiy fanlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span id="subject1-correct">0</span></td>
+                        <td><span id="subject2-correct">0</span></td>
+                        <td><span id="mandatory-correct">0</span></td>
+                    </tr>
+                    <tr>
+                        <td><span id="subject1-score">0</span></td>
+                        <td><span id="subject2-score">0</span></td>
+                        <td><span id="mandatory-score">0</span></td>
+                    </tr>
+                </tbody>
+            </table>
+    
+            <!-- Do‘stlarga ulashish qismi -->
+            <div class="share-container">
+                <p>Do‘stlarga ulashing</p>
+                <a href="#" class="share-button">
+                    <i class='bx bxl-telegram'></i> Telegram
+                </a>
+            </div>
+    
+            <!-- Pastdagi tugmalar -->
+            <div class="modal-actions">
+                <button class="secondary-button">Natijalar jadvali</button>
+                <button class="secondary-button">Test tahlili</button>
+                <button id="exitTest" class="confirm-button">Testdan chiqish</button>
+            </div>
+        </div>
+    </div>
+
+
 
     <script src="{% static 'js/script.js' %}"></script>
 </body>

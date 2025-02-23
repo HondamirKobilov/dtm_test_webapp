@@ -37,15 +37,41 @@ body {
 }
 
 /* Diagnostika kartalari */
-.exam-card {
+.exam-carta {
     background: white;
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 100%; /* Ekran o'lchamiga moslashish */
+    overflow: hidden; /* Tashqariga chiqmasin */
 }
-
-.exam-card h3 {
+.exam-carta .math-equation {
+    display: block;
+    max-width: 100%; /* Katta formulalar sig‘sin */
+    white-space: normal;
+    word-break: break-word; /* Uzoq so‘zlarni bo‘lib chiqish */
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.6;
+}
+.math-equation {
+    display: block;
+    max-width: 100%;
+    text-align: center;
+    overflow-wrap: break-word;
+}
+.exam-card-content {
+    max-width: 100%; /* Kartochkadan tashqariga chiqmaslik uchun */
+    overflow: hidden; /* Ichkarida qolishini ta’minlash */
+    word-wrap: break-word;
+}
+.exam-card-content math {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+.exam-carta h3 {
     margin: 0 0 10px;
 }
 
@@ -322,4 +348,681 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     display: none; /* Defaultda yashirilgan bo‘lsin */
+}
+
+
+/* Umumiy sozlamalar */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #007BFF;
+    color: white;
+    padding: 15px 20px;
+}
+
+.navbar .title {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.profile-icon img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Asosiy container */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+/* Diagnostika kartalari */
+.exam-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.exam-card h3 {
+    margin: 0 0 10px;
+}
+
+/* Sana va abituriyentlar sonini bitta qatorda chiqarish */
+.exam-info {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.divider {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Tugmalar */
+.start-button, .back-button {
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    padding: 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 15px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+}
+
+.start-button:hover {
+    background-color: #0056b3;
+}
+
+.back-button {
+    background-color: #d1d1d1;
+    color: black;
+}
+
+.back-button:hover {
+    background-color: #aaa;
+}
+
+/* **Imtihonni boshlash UI** */
+.exam-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Savollarni tartib bilan chiqarish */
+.exam-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* Savol matni */
+.exam-card h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Test tugmachalari */
+#test-navigation {
+    text-align: center;
+    margin-top: 20px;
+    padding: 7px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+
+#test-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px;
+    margin: 10px auto;
+}
+
+.test-nav-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #95b6d8;
+    background: white;
+    color: black;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: background 0.3s ease, text-decoration 0.3s ease;
+}
+
+.test-nav-btn:hover {
+    background: #9ec2ef;
+    color: black;
+    text-decoration: underline;
+}
+
+/* Sticky Qolgan Vaqt */
+#sticky-timer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none; /* Defaultda yashirilgan */
+}
+.exam-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    overflow: visible;  /* 🚀 Ko‘rinmay qolayotgan elementlarni to‘liq ko‘rsatish */
+    word-wrap: break-word;  /* 🔥 Formulalar va uzun matnlarni to‘g‘ri chiqarish */
+}
+
+.mathjax-block {
+    display: block;
+    max-width: 100%;
+    text-align: left;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    font-size: 1.1em; /* Formulalar o'lchamini avtomatik moslash */
+}
+.exam-card p {
+    word-wrap: break-word;
+    overflow: hidden;
+    white-space: normal;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.math-container {
+    overflow-x: auto;  /* Formulalar sig‘masa gorizontal skroll hosil qiladi */
+    white-space: nowrap;
+    display: block;
+    max-width: 100%;
+}
+
+.mathjax-container {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    font-size: 1rem;  /* Matn hajmini moslashtirish */
+}
+
+.mathjax-container svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* Matematik ifodalarni sig‘dirish va moslashuvchan qilish */
+.mathjax-container {
+    font-size: 1rem;
+    max-width: 100%;
+    white-space: normal !important; /* Matnni yangi qatorga o‘tkazish */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    display: block !important; /* Formulalar har doim blok holatida bo‘lishi */
+}
+
+.exam-card .math-equation {
+    font-size: 16px;
+    line-height: 1.5;
+    word-break: break-word;
+    white-space: normal !important;
+    overflow-wrap: break-word;
+    display: block !important; /* Ifodalar keyingi qatordan boshlanadi */
+    max-width: 100%;
+}
+
+/* Matnlarning sig‘ishi uchun */
+.exam-card p {
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal !important;
+}
+
+/* Mobil ekranlar uchun */
+.mathjax-container {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal !important;
+    display: block !important;
+    text-align: left;
+}
+
+.math-equation {
+    font-size: 1rem;
+    line-height: 1.5;
+    word-break: break-word;
+    white-space: normal !important;
+    display: block !important;
+}
+
+.exam-card p {
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal !important;
+}
+
+.test-nav-btn {
+    background-color: white; /* Tugmalar odatda oq bo‘lib turadi */
+    color: black;
+    border: 1px solid #007BFF;
+    transition: background 0.2s ease;
+}
+
+/* ✅ Tanlanmagan tugmalar hover bo‘lganda */
+.test-nav-btn:hover {
+    background-color: #e0e0e0 !important; /* 🔘 Oq tugmalar hover bo‘lsa kulrang bo‘ladi */
+}
+
+/* ✅ Tanlangan tugmalar */
+.test-nav-btn.selected {
+    background-color: #007BFF !important; /* 🔵 Belgilangan tugmalar doim ko‘k bo‘ladi */
+    color: white !important;
+}
+
+/* ✅ Tanlangan tugmalar hover bo‘lsa */
+.test-nav-btn.selected:hover {
+    background-color: #0056b3 !important; /* 🔵 To‘q ko‘k */
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 400px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px; /* Tugmalar orasida masofa */
+    width: 100%; /* To‘liq kenglikda bo‘lishi */
+}
+
+.confirm-button,
+.cancel-button {
+    flex: 1; /* ✅ Tugmalarni bir xil uzunlikka moslash */
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+}
+
+/* ✅ Ha tugmasi - yashil */
+.confirm-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.confirm-button:hover {
+    background-color: #218838;
+}
+
+/* ✅ Yo‘q tugmasi - kulrang */
+.cancel-button {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.cancel-button:hover {
+    background-color: #d6d6d6;
+}
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 500px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.result-table th, .result-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.result-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.confirm-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.secondary-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.secondary-button:hover {
+    background-color: #d6d6d6;
+}
+
+.share-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.share-button img {
+    width: 40px;
+    margin: 0 10px;
+    cursor: pointer;
+}
+/* 📌 MODAL asosiy oyna */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px; /* Juda katta ekranda ham to‘g‘ri chiqadi */
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* 📌 Umumiy natijalar jadvali */
+.summary-table,
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.summary-table th,
+.summary-table td,
+.result-table th,
+.result-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* 📌 Do‘stlarga ulashish */
+.share-container {
+    display: flex;
+    flex-wrap: wrap; /* ✅ Katta ekranda yonma-yon, kichik ekranda pastga tushadi */
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.share-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    font-size: 14px;
+    width: 150px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #007bff;
+    justify-content: center;
+}
+
+.share-button img {
+    width: 20px;
+    height: 20px;
+}
+
+/* 📌 Tugmalarni to‘g‘ri chiqishini ta’minlash */
+.modal-actions {
+    display: flex;
+    flex-wrap: wrap; /* ✅ Katta ekranda yonma-yon, kichik ekranda pastga tushadi */
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.modal-actions button {
+    flex: 1; /* ✅ Tugmalar teng bo‘lishi uchun */
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+/* 📌 Tugmalar dizayni */
+.secondary-button {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.secondary-button:hover {
+    background-color: #e2e6ea;
+}
+
+.confirm-button {
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
+}
+
+.confirm-button:hover {
+    background-color: #218838;
+}
+
+/* 📌 📱 Mobil (768px) */
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: 350px;
+        padding: 15px;
+    }
+
+    .result-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .result-info p {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .summary-table th, .summary-table td,
+    .result-table th, .result-table td {
+        font-size: 14px;
+        padding: 6px;
+    }
+
+    /* 📌 Ulashish tugmalari */
+    .share-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .share-button {
+        width: 80%;
+        max-width: 200px;
+    }
+
+    /* 📌 Tugmalarni ALBATTA alohida qatorda chiqishiga majbur qilish */
+    .modal-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .modal-actions button {
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+}
+
+/* 📌 📱 Juda kichik ekranlar (480px) */
+@media screen and (max-width: 480px) {
+    .modal-content {
+        width: 98%;
+        max-width: 320px;
+        padding: 10px;
+    }
+
+    .result-info p {
+        font-size: 12px;
+    }
+
+    .summary-table th, .summary-table td,
+    .result-table th, .result-table td {
+        font-size: 12px;
+        padding: 5px;
+    }
+
+    .share-container {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .share-button {
+        font-size: 12px;
+        padding: 6px;
+        width: 100%;
+        max-width: 200px;
+    }
+
+    /* 📌 Tugmalarni alohida qatorda chiqish */
+    .modal-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .modal-actions button {
+        font-size: 14px;
+        padding: 12px;
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+}
+
+/* 📌 Katta ekranlar uchun (1024px dan kattasi) */
+@media screen and (min-width: 1024px) {
+    .modal-content {
+        width: 70%;
+        max-width: 600px;
+    }
+
+    .share-container {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .modal-actions {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .modal-actions button {
+        font-size: 16px;
+        padding: 12px;
+    }
 }
