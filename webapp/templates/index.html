@@ -7,7 +7,8 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
-
+    <link rel="icon" type="image/x-icon" href="https://www.google.com/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script>
         window.MathJax = {
             tex: {
@@ -62,12 +63,11 @@
             <select id="foreign-language"></select>
         </div>
         <button class="start-button">Imtihonni boshlash</button>
-        <button class="back-button" id="back-to-list">← Ortga</button>
+        <button class="back-button" id="backmenu">← Ortga</button>
     </main>
 
     <!-- Test sahifasi -->
     <main class="container hidden" id="test-container">
-        <h2 class="exam-title">Testlar</h2>
         <div id="questions"></div>
         <div id="sticky-timer">03:00:00</div>
         <div id="test-navigation">
@@ -163,9 +163,37 @@
             </div>
         </div>
     </div>
+    <div id="resultsContainer" class="container hidden">
+        <div id="resultsHeader">
+            <button id="backToList"><i class="fas fa-arrow-left"></i></button>
+            <h2 id="resultsTitle"></h2>
+            <div id="filter-container">
+                <label for="filterSubject1">1-fan:</label>
+                <select id="filterSubject1">
+                    <option value="">Barcha fanlar</option>
+                </select>
+                <label for="filterSubject2">2-fan:</label>
+                <select id="filterSubject2">
+                    <option value="">Barcha fanlar</option>
+                </select>
+            </div>
+        </div>
 
-
-
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Ishtirokchi</th>
+                    <th class="mobile-hide">1-fan</th>
+                    <th class="mobile-hide">2-fan</th>
+                    <th class="mobile-hide">Majburiy fan</th>
+                    <th>Ball</th>
+                    <th>Yakunlandi</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
+    </div>
     <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

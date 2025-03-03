@@ -95,3 +95,22 @@ class History(models.Model):
 
     def __str__(self):
         return f"{self.user.fullname} - {self.diagnostika.name}"
+
+class Result(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    diagnostika = models.ForeignKey(Diagnostika, on_delete=models.CASCADE, related_name="results")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="results")
+    subject1_name = models.CharField(max_length=255)  # 1-fan nomi
+    subject2_name = models.CharField(max_length=255)  # 2-fan nomi
+    correct_answers_subject1 = models.IntegerField(default=0)  # 1-fan to‘g‘ri javoblar soni
+    correct_answers_subject2 = models.IntegerField(default=0)  # 2-fan to‘g‘ri javoblar soni
+    correct_answers_mandatory = models.IntegerField(default=0)  # Majburiy fan to‘g‘ri javoblar soni
+    total_score = models.FloatField(default=0)  # Jami ball
+    completed_at = models.DateTimeField(auto_now_add=True)  # Yakunlangan vaqti (18.06.2024 19:17)
+
+    class Meta:
+        managed = False
+        db_table = "results"
+
+    def __str__(self):
+        return f"{self.user.fullname} - {self.diagnostika.name} - {self.total_score} ball"

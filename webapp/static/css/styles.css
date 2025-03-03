@@ -898,8 +898,316 @@ body {
 .confirm-button:hover {
     background-color: #218838;
 }
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
 
-/* 📌 📱 Mobil (768px) */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    background: royalblue;
+    color: white;
+    padding: 15px;
+    text-align: left;
+}
+
+h2 {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+button {
+    background-color: royalblue;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: darkblue;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #ffffff; /* Header qismi rangsiz bo'ladi */
+    font-weight: bold;
+}
+td {
+    color: #274741;
+}
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+.back-button, #backToList {
+    background-color: #999;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.results-table th, .results-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.results-table th {
+    background-color: #ffffff; /* Header qismi rangsiz bo'lishi uchun */
+}
+
+.results-table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.results-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.results-table tbody tr:hover {
+    background-color: #e6f7ff;
+}
+
+.participant-name {
+    font-size: 14px;
+    color: gray;
+}
+
+.subject-name {
+    font-size: 14px;
+    color: gray;
+    font-weight: normal;
+}
+
+.total-score {
+    font-size: 14px;
+    color: gray;
+    font-weight: normal;
+}
+
+.date-format {
+    font-size: 14px;
+    color: gray;
+    font-weight: normal;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    background-color: royalblue;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    font-size: 16px;
+    font-weight: bold;
+    color: #444;
+}
+/* 📌 Filter container dizayni */
+#filter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+/* 📌 Label (Matn) dizayni */
+#filter-container label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-right: 5px;
+}
+
+/* 📌 Select option dizayni */
+#filter-container select {
+    width: 200px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: white;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* 📌 Hover va Focus effekti */
+#filter-container select:hover {
+    border-color: #888;
+}
+
+#filter-container select:focus {
+    border-color: royalblue;
+    box-shadow: 0 0 5px rgba(65, 105, 225, 0.5);
+    color: #333;
+}
+
+/* 📌 Filterdagi optionlar rangi */
+#filter-container select option {
+    color: #333;
+}
+
+/* 📌 Jadval dizayni */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.results-table th, .results-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* 📌 Header (1-qator) dizayni */
+.results-table thead th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* 📌 Har xil rangli qatorlar */
+.results-table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.results-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* 📌 Hover effekti */
+.results-table tbody tr:hover {
+    background-color: #e6f7ff;
+}
+#backToList {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 5%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: background 0.3s ease-in-out;
+    text-align: left;
+}
+
+#backToList:hover {
+    background-color: #0056b3;
+}
+#resultsHeader {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 15px;
+    border-bottom: 2px solid #ddd;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* 📌 Tugma va sarlavhani chiroyli joylash */
+#backToList {
+    position: absolute;
+    left: 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+#backToList:hover {
+    background-color: #0056b3;
+}
+
+/* 📌 Sarlavhani markazga joylash */
+#resultsTitle {
+    margin: 0 auto;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* 📌 Filter container */
+#filter-container {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#filter-container select {
+    padding: 6px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 📌 Mobil moslashuv */
+
 @media screen and (max-width: 768px) {
     .modal-content {
         width: 95%;
@@ -953,9 +1261,37 @@ body {
         text-align: center;
         display: block;
     }
+
+    /* 📌 📌 📌 Fan tanlash (Filter) uchun dizayn */
+    #filter-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    #filter-container label {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    #filter-container select {
+        width: 90%;
+        max-width: 250px;
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: white;
+        color: #555;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+    }
 }
 
-/* 📌 📱 Juda kichik ekranlar (480px) */
+/* 📌 480px dan kichik ekranlar (Juda kichik telefonlar) */
 @media screen and (max-width: 480px) {
     .modal-content {
         width: 98%;
@@ -1002,6 +1338,27 @@ body {
         text-align: center;
         display: block;
     }
+
+    /* 📌 📌 📌 Fan tanlash (Filter) uchun dizayn */
+    #filter-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        width: 100%;
+    }
+
+    #filter-container label {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    #filter-container select {
+        width: 95%;
+        max-width: 250px;
+        padding: 6px;
+        font-size: 12px;
+    }
 }
 
 /* 📌 Katta ekranlar uchun (1024px dan kattasi) */
@@ -1025,4 +1382,125 @@ body {
         font-size: 16px;
         padding: 12px;
     }
+
+    /* 📌 📌 📌 Fan tanlash (Filter) katta ekranda to‘g‘ri chiqishi */
+    #filter-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+
+    #filter-container label {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    #filter-container select {
+        width: 200px;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: white;
+        color: #555;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+    }
 }
+
+/* CSS */
+/* Mobil telefonlar uchun (max-width: 600px) */
+/* Mobil telefonlar uchun (max-width: 600px) */
+/* Mobil telefonlar uchun (max-width: 600px) */
+@media screen and (max-width: 600px) {
+    .mobile-hide {
+        display: none;  /* Kerak bo'lmagan ustunlarni yashirish */
+    }
+
+    /* Mobil versiyada matn hajmini kichraytirish */
+    .results-table th, .results-table td {
+        font-size: 12px;  /* Asosiy matn hajmini kichraytirish */
+        padding: 8px;  /* Ichki chegarani moslashtirish */
+    }
+    .participant-name, .subject-name {
+        font-size: 11px;  /* Qo'shimcha ma'lumotlar uchun yanada kichikroq hajm */
+    }
+
+    /* Agar zarur bo'lsa, boshqa elementlarning ko'rinishini ham moslashtirishingiz mumkin */
+    .modal-content, .results-header {
+        padding: 10px;  /* Modal va sarlavha uchun ichki chegarani kichraytirish */
+    }
+}
+@media screen and (max-width: 600px) {
+    /* Telefon versiyasi uchun matn hajmini kichraytirish */
+    .results-table th, .results-table td {
+        font-size: 12px; /* Asosiy matn hajmini kichraytirish */
+        padding: 8px;  /* Ichki chegarani moslashtirish */
+    }
+
+    /* Faqat muayyan ustunlar uchun matn hajmini yanada kichraytirish */
+    .results-table th:first-child, /* Position */
+    .results-table th:nth-child(2), /* Ishtirokchi */
+    .results-table th:nth-child(6), /* Ball */
+    .results-table th:last-child { /* Yakunlandi */
+        font-size: 13px; /* Matn hajmini yanada kichraytirish */
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #backToList {
+        width: 30px;
+        border: none;  /* Chegarani olib tashlash */
+        border-radius: 5px;  /* Burchaklarni yumaloqlashtirish */
+        margin-left: -10px;
+        cursor: pointer;  /* Cursor ko'rinishini tugma ko'rinishiga o'zgartirish */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);  /* Tugma ustida soya berish */
+        padding: 0 7px;
+    }
+    .fas{
+        font-size: 17px;
+    }
+    #backToList:hover {
+        background-color: #e0e0e0;  /* Tugma ustiga bosilganda rangini o'zgartirish */
+    }
+
+}
+
+@media screen and (max-width: 600px) {
+    #resultsHeader {
+        padding: 0; /* Sarlavha uchun ichki chegarani sozlash */
+        text-align: center; /* Sarlavha matnini markazga o'rnatish */
+        background-color: #f7f7f7; /* Orqa fon rangini o'zgartirish */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soya berish */
+
+    }
+    #resultsTitle{
+        margin-top: 15px !important;
+    }
+    #resultsHeader button#backToList {
+        font-size: 24px; /* Orqaga qaytish tugmasini kattaroq qilish */
+        margin-right: 10px; /* O'ng tomoniga chegarani sozlash */
+    }
+
+    #resultsHeader h2 {
+        font-size: 16px; /* Sarlavha hajmini kichraytirish */
+        margin: 0; /* Marginlarni olib tashlash */
+        padding-bottom: 10px; /* Pastki qismga padding qo'shish */
+    }
+
+    #filter-container {
+        display: flex; /* Flexbox ishlatish */
+        flex-direction: column; /* Elementlarni ustun ko'rinishida joylashtirish */
+        align-items: center; /* Elementlarni markazga joylashtirish */
+        gap: 5px; /* Elementlar orasidagi masofani sozlash */
+    }
+
+    #filter-container label, #filter-container select {
+        width: 100%; /* Kenglikni to'liq ekran kengligiga sozlash */
+        font-size: 14px; /* Font o'lchamini sozlash */
+    }
+}
+

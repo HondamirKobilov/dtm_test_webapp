@@ -9,13 +9,14 @@ SECRET_KEY = 'django-insecure-w(zfjc0p(i*#cs-egz38=5re5cmf-opa-k3y%zny8n9y@i*ijs
 
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'mandatuz.uz',
-    '.mandatuz.uz',
-]
+ALLOWED_HOSTS = ['f7c1-92-63-205-144.ngrok-free.app', 'localhost', '127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = ['https://f7c1-92-63-205-144.ngrok-free.app']
+
+
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -24,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'webapp'
 ]
 
