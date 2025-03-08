@@ -111,7 +111,25 @@ body {
 .start-button:hover {
     background-color: #0056b3;
 }
+.start-button1, .back-button {
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    padding: 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 15px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+}
 
+.start-button1:hover {
+    background-color: #0056b3;
+}
 .back-button {
     background-color: #d1d1d1;
     color: black;

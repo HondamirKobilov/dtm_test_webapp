@@ -15,7 +15,9 @@ function fixLatexFormulas(latex) {
         .replace(/\$(.*?)\$/g, "\\($1\\)") // `$...$` ni inline MathJax formatiga o'tkazish
         .replace(/\$\$(.*?)\$\$/g, "\\[$1\\]"); // `$$...$$` ni block MathJax formatiga o'tkazish
 }
+
 let selectedSubjects = {};
+let diaginostikaId = null;
 document.addEventListener("DOMContentLoaded", function () {
    let diagnostikaContainer = document.getElementById("diagnostika-list");
    let examContainer = document.getElementById("exam-container");
@@ -24,24 +26,16 @@ document.addEventListener("DOMContentLoaded", function () {
    let resultsBody = document.getElementById("resultsBody");
    let backToList = document.getElementById("backToList");
    let backmenu = document.getElementById("backmenu");
-   let startExamButton = document.querySelector(".start-button");
+   let startExamButton = document.querySelector(".start-button1");
    let questionsDiv = document.getElementById("questions");
    let testContainer = document.getElementById("test-container");
-   // if (window.Telegram) {
-   //      console.log("Telegram WebApp muhiti aniqlandi.");
-   //      const tg = Telegram.WebApp;
-   //      tg.ready();  // Telegramga web-app tayyorligini bildirish
-   //
-   //      // Foydalanuvchi ID'ni olish
-   //      const userId = tg.initDataUnsafe.user.id;
-   //      console.log("Foydalanuvchi ID:", userId);
-   //
-   //      // Boshqa amallar...
-   //  } else {
-   //      console.error("Bu skript Telegram WebApp muhitida ishlatilmayapti.");
-   //  }
-   const frontHost = "https://f7c1-92-63-205-144.ngrok-free.app"
-   let userId = 1405814595;
+
+   const frontHost = "https://b361-92-63-205-138.ngrok-free.app"
+   const tg = window.Telegram.WebApp;
+   tg.ready();
+   const userId = tg.initDataUnsafe.user.id;
+
+   // let userId = 1405814595;
     // ✅ Diagnostikalar ro‘yxatini yuklash
     console.log("UserID>>>", userId)
     fetch(`/api/diagnostikas/`)
@@ -64,7 +58,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 ]).then(([resultData, usersData]) => ({
                     ...diagnostika,
                     hasResult: resultData.exists,
-                    users_count: usersData.users_count
+                    users_count: usersData.users_count,
+                    status: resultData.status
                 }))
             );
             let diagnostikaList = await Promise.all(diagnostikaPromises);
@@ -73,7 +68,13 @@ document.addEventListener("DOMContentLoaded", function () {
             diagnostikaList.sort((a, b) => b.id - a.id);
 
             diagnostikaList.forEach(diagnostika => {
-                let buttonText = diagnostika.hasResult ? "Natijalar" : "Test topshirish";
+                // let buttonText = diagnostika.hasResult ? "Natijalar" : "Test topshirish";
+                let buttonText;
+                if (!diagnostika.status || diagnostika.hasResult) {
+                    buttonText = "Natijalar"; // 🔹 Diagnostika tugagan yoki user qatnashgan
+                } else {
+                    buttonText = "Test topshirish"; // 🔹 Diagnostika aktiv va user qatnashmagan
+                }
                 let examCard = document.createElement("div");
                 examCard.className = "exam-carta";
                 examCard.innerHTML = `
@@ -83,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <span class="divider">/</span> 
                         <span class="exam-stats">👥 <strong>${diagnostika.users_count}</strong> ta abituriyent</span>
                     </p>
-                    <button class="start-button" data-id="${diagnostika.id}" data-result="${diagnostika.hasResult}">
+                    <button class="start-button" data-status="${diagnostika.status}" data-id="${diagnostika.id}" data-result="${diagnostika.hasResult} ">
                         ${buttonText}
                     </button>
                 `;
@@ -94,12 +95,12 @@ document.addEventListener("DOMContentLoaded", function () {
             // ✅ Tugmalarni faollashtirish
             document.querySelectorAll(".start-button").forEach(button => {
                 button.addEventListener("click", function () {
-                    let diagnostikaId = this.getAttribute("data-id");
                     let hasResult = this.getAttribute("data-result") === "true";
-
+                    let diagnostikaId = this.getAttribute("data-id"); // ✅ Diagnostika ID ni olish
+                    let isActive = this.getAttribute("data-status") === "true";
                     localStorage.setItem("diagnostika_id", diagnostikaId);
-
-                    if (hasResult) {
+                    // let status = this.getAttribute("data-status") === "true";
+                    if (hasResult || !isActive) {
                         diagnostikaContainer.classList.add("hidden");
                         resultsContainer.classList.remove("hidden");
                         loadResults(diagnostikaId);
@@ -114,20 +115,17 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error:", error);
             diagnostikaContainer.innerHTML = "<p class='error-message'>❌ Ma'lumotlarni yuklashda xatolik yuz berdi.</p>";
         });
-
     // ✅ Natijalarni yuklash funksiyasi
     async function loadResults(diagnostikaId) {
         try {
             let response = await fetch(`${frontHost}/api/results/?diagnostika_id=${diagnostikaId}`);
             let data = await response.json();
             console.log("✅ API dan kelgan natijalar:", data);
-
             if (!data.results.length) {
                 console.log("❌ Natijalar topilmadi!");
                 resultsContainer.innerHTML = "<p class='error-message'>❌ Natijalar yo‘q</p>";
                 return;
             }
-
             resultsTitle.textContent = `Diagnostik imtihon #${diagnostikaId}`;
             allResults = data.results; // 📌 Natijalarni saqlaymiz
             populateSubjects(allResults); // 🔹 Dropdownlarni to‘ldiramiz
@@ -246,17 +244,34 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('foreign-language').selectedIndex = 0;
     });
     fetchSubjects();
-    startExamButton.addEventListener("click", function () {
-        let diagnostikaId = localStorage.getItem("diagnostika_id");
+    startExamButton.addEventListener("click", async function () {
         let subject1 = document.getElementById("subject1").value;
         let subject2 = document.getElementById("subject2").value;
         let foreignLanguage = document.getElementById("foreign-language").value;
-        if (!diagnostikaId) {
-            alert("Iltimos, diagnostikani tanlang!");
-            return;
-        }
+
         if (!subject1 || !subject2) {
             alert("Iltimos, ikkita mutaxassislik fanini tanlang!");
+            return;
+        }
+        let diagnostikaId = localStorage.getItem("diagnostika_id");
+        if (!diagnostikaId || diagnostikaId === "null") {
+            alert("⚠️ Bu diaginostikaga test joylanmagan! Iltimos, boshqa diagnostikani tanlang.");
+            return;
+        }
+        let checkSubjectsResponse = await fetch(`/api/check-diagnostika-subjects/?diagnostika_id=${diagnostikaId}`);
+        let checkSubjectsData = await checkSubjectsResponse.json();
+
+        // **Agar diagnostikaga bog‘langan fanlar mavjud bo‘lmasa**
+        if (checkSubjectsData.subjects.length === 0) {
+            alert("⚠️ Hali test joylanmagan!");
+            return;
+        }
+
+        // **Tanlangan fanlar diagnostika bo‘yicha mavjudligini tekshirish**
+        let availableSubjects = checkSubjectsData.subjects.map(subject => subject.name);
+
+        if (!availableSubjects.includes(subject1) || !availableSubjects.includes(subject2)) {
+            alert("⚠️ Bu fanlar bo‘yicha hali testlar joylanmagan!");
             return;
         }
         function shuffleArray(array) {
@@ -275,7 +290,6 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedSubjects.subject1 = subject1;
         selectedSubjects.subject2 = subject2;
         selectedSubjects.diaginostika_id = diagnostikaId;
-        // ✅ Chet tili qo‘shilishi
         if (document.getElementById("foreign-language-container").style.display === "block" && foreignLanguage) {
             requestData.foreign_language = foreignLanguage;
         }
@@ -291,9 +305,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log("aoasnasjnsajn")
                 questionsDiv.innerHTML = "";
                 let startNumber = 1;
+                fetch(`${frontHost}/api/diagnostika-users-count/?diagnostika_id=${diagnostikaId}`)
+                    .then(response => response.json()) // JSON formatiga o‘tkazish
+                    .then(usersData => {
+                        let participantCountElement = document.getElementById("participant-count");
+                        if (participantCountElement) {
+                            participantCountElement.textContent = usersData.users_count;
+                        }
+                    })
+                    .catch(error => console.error("Xatolik:", error));
 
                 data.questions.forEach(subjectData => {
-
                     let subjectTitle = document.createElement("h2");
                     subjectTitle.textContent = subjectData.subject_name;
                     subjectTitle.classList.add("exam-title");
@@ -325,7 +347,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                 });
 
-            // ✅ **Variant tanlanganda pastdagi tugma yashil bo‘lishi**
                 document.querySelectorAll(".answers input[type='radio']").forEach(radio => {
                     radio.addEventListener("change", function () {
                         let questionNumber = this.name.replace("q", ""); // Masalan: q5 -> 5
@@ -337,7 +358,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         });
 
                         if (relatedButton) {
-                            relatedButton.classList.add("selected"); // ✅ Tugmaning rangi yashil bo‘ladi
+                            relatedButton.classList.add("selected");
                         }
                     });
                 });
@@ -351,7 +372,6 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 alert("Qaysidir fanda hali test mavjud emas");
             }
-
         })
         .catch(error => {
             console.error("Xatolik:", error);
@@ -589,10 +609,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // ✅ Telegram Web App orqali user_id olish
-        // const tg = window.Telegram.WebApp;
-        // tg.ready();
-        // let userId = tg.initDataUnsafe?.user?.id || 1111;
-        let userId = 1405814595;
+        const frontHost = "https://ffcf-185-139-138-139.ngrok-free.app"
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        const userId = tg.initDataUnsafe.user.id;
+
+        // let userId = 1405814595;
         let diagnostikaId = selectedSubjects.diaginostika_id;
         console.log(diagnostikaId)
         // ✅ Foydalanuvchining natijalarini serverga yuborish

@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.timezone import now
+
 
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -26,8 +28,11 @@ class User(models.Model):
 class Diagnostika(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(default=now)
+    finished_at = models.DateTimeField(null=True, blank=True)  # ✅ Tugash vaqti
+    status = models.BooleanField(default=True)  # ✅ Diagnostika holati (True - aktiv, False - tugagan)
+
     users = models.ManyToManyField(User, related_name="diagnostikas", db_table="user_diagnostika_association")
 
     class Meta:
@@ -114,3 +119,13 @@ class Result(models.Model):
 
     def __str__(self):
         return f"{self.user.fullname} - {self.diagnostika.name} - {self.total_score} ball"
+class DiagnostikaSubjectAssociation(models.Model):
+    diagnostika = models.ForeignKey("Diagnostika", on_delete=models.CASCADE)
+    subject = models.ForeignKey("Subject", on_delete=models.CASCADE)
+
+    class Meta:
+        managed = False
+        db_table = "diagnostika_subject_association"
+
+    def __str__(self):
+        return f"{self.diagnostika.name} - {self.subject.name}"

@@ -1,10 +1,11 @@
 import json
 
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Diagnostika, Subject, Question, Answer, User, Result
+from .models import Diagnostika, Subject, Question, Answer, User, Result, DiagnostikaSubjectAssociation
 from .serializers import QuestionSerializer, AnswerSerializer
 from django.utils.timezone import now
 
@@ -46,15 +47,18 @@ class CheckUserResultAPIView(APIView):
 
         if not user_id or not diagnostika_id:
             return Response({"error": "user_id va diagnostika_id talab qilinadi"}, status=400)
-
+        diagnostika = get_object_or_404(Diagnostika, id=diagnostika_id)
         exists = Result.objects.filter(user__user_id=user_id, diagnostika__id=diagnostika_id).exists()
-        return Response({"exists": exists})
+        print(diagnostika.name, " >>>", exists, diagnostika.status)
+        return Response({
+            "exists": exists,
+            "status": diagnostika.status
+        })
 class SubjectListAPIView(APIView):
     def get(self, request, *args, **kwargs):
         subjects = Subject.objects.all().order_by('name')
         subjects_list = [{"id": subject.id, "name": subject.name} for subject in subjects]
         return Response({"status": "success", "subjects": subjects_list}, status=status.HTTP_200_OK)
-
 
 class DiagnostikaUsersCountAPIView(APIView):
     def get(self, request):
@@ -237,3 +241,21 @@ class CheckAnswersAPIView(APIView):
 
         except Exception as e:
             return Response({"status": "error", "message": str(e)}, status=500)
+
+
+class CheckDiagnostikaSubjectsAPIView(APIView):
+    def get(self, request):
+        diagnostika_id = request.GET.get("diagnostika_id")
+
+        if not diagnostika_id:
+            return JsonResponse({"error": "diagnostika_id talab qilinadi"}, status=400)
+
+        # DiagnostikaSubjectAssociation orqali bog‘langan fanlarni olish
+        subjects = Subject.objects.filter(
+            id__in=DiagnostikaSubjectAssociation.objects.filter(
+                diagnostika_id=diagnostika_id
+            ).values_list("subject_id", flat=True)
+        ).values("id", "name")
+
+        # Agar hech qanday fan bog‘lanmagan bo‘lsa, bo‘sh ro‘yxat qaytariladi
+        return JsonResponse({"subjects": list(subjects)})
