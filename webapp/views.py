@@ -2,6 +2,7 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
+from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -82,8 +83,8 @@ class DiagnostikaResultsAPIView(APIView):
         results = Result.objects.filter(diagnostika_id=diagnostika_id)
         user_ids = results.values_list("user_id", flat=True)
 
-        if not user_ids:
-            return Response({"error": "Natijalar topilmadi!"}, status=status.HTTP_404_NOT_FOUND)
+        # if not user_ids:
+        #     return Response({"error": "Natijalar topilmadi!"}, status=status.HTTP_404_NOT_FOUND)
 
         # 2️⃣ User ID lar orqali users jadvalidan fullname ustunini olish
         users = User.objects.filter(id__in=user_ids).values("id", "fullname")
@@ -166,13 +167,15 @@ class CheckAnswersAPIView(APIView):
     def post(self, request, *args, **kwargs):
         try:
             data = request.data
-            print("📌 Kelayotgan JSON ma'lumotlar:", json.dumps(data, indent=4))  # ✅ Logda tekshirish uchun
+            print("📌 Kelayotgan JSON ma'lumotlar:", json.dumps(data, indent=4))  # ✅ Log uchun
             user_id = data.get("user_id")
             diagnostika_id = data.get("diagnostika_id")
             subject1_name = data.get("subject1_name")
             subject2_name = data.get("subject2_name")
             answers = data.get("answers", [])
             total_questions = data.get("total_questions", 0)
+            allQuestionIds = data.get("allQuestionIds")
+            duration_time = data.get("duration_time", "00:00:00")
 
             if not total_questions or not diagnostika_id or not user_id:
                 return Response({"status": "error", "message": "Ma'lumotlar yetarli emas!"}, status=400)
@@ -188,18 +191,25 @@ class CheckAnswersAPIView(APIView):
             correct_count_2 = 0
             correct_count_mandatory = 0
 
+            correct_answers = []  # ✅ To‘g‘ri javoblar ID lari
+            wrong_answers = []  # ❌ Noto‘g‘ri javoblar ID lari
+
             for answer in answers:
                 answer_id = answer["answer_id"]
-                order_number = answer["order_number"]  # Tartib raqam
+                order_number = answer["order_number"]
 
                 selected_answer = Answer.objects.filter(id=answer_id).first()
-                if selected_answer and selected_answer.is_correct:
-                    if 1 <= order_number <= 30:
-                        correct_count_1 += 1
-                    elif 31 <= order_number <= 60:
-                        correct_count_2 += 1
-                    elif 61 <= order_number <= 90:
-                        correct_count_mandatory += 1
+                if selected_answer:
+                    if selected_answer.is_correct:
+                        correct_answers.append(answer_id)  # ✅ To‘g‘ri javob
+                        if 1 <= order_number <= 30:
+                            correct_count_1 += 1
+                        elif 31 <= order_number <= 60:
+                            correct_count_2 += 1
+                        elif 61 <= order_number <= 90:
+                            correct_count_mandatory += 1
+                    else:
+                        wrong_answers.append(answer_id)  # ❌ Noto‘g‘ri javob
 
             incorrect_count = total_questions - (correct_count_1 + correct_count_2 + correct_count_mandatory)
 
@@ -209,7 +219,7 @@ class CheckAnswersAPIView(APIView):
             score_mandatory = round(correct_count_mandatory * 1.1, 1)
             total_score = round(score_1 + score_2 + score_mandatory, 1)
 
-
+            # ✅ Natijalarni bazaga saqlash
             Result.objects.create(
                 diagnostika=diagnostika,
                 user=user,
@@ -219,6 +229,10 @@ class CheckAnswersAPIView(APIView):
                 correct_answers_subject2=correct_count_2,
                 correct_answers_mandatory=correct_count_mandatory,
                 total_score=total_score,
+                correct_answer_ids=correct_answers,  # ✅ JSONB formatda saqlash
+                wrong_answer_ids=wrong_answers,  # ✅ JSONB formatda saqlash
+                all_answer_ids=allQuestionIds,  # 🔵 Barcha ishlagan savollar JSONB formatda
+                duration_time=duration_time,  # ⏳ Test vaqtini HH:MM:SS formatda saqlash
                 completed_at=now()
             )
 
@@ -229,7 +243,11 @@ class CheckAnswersAPIView(APIView):
                 "total_questions": total_questions,
                 "percentage": round(
                     ((correct_count_1 + correct_count_2 + correct_count_mandatory) / total_questions) * 100, 1),
+                "duration_time": duration_time,  # ⏳ Testni bajargan vaqt (HH:MM:SS)
                 "total_score": total_score,
+                "correct_answer_ids": correct_answers,
+                "wrong_answer_ids": wrong_answers,
+                "all_answer_ids": allQuestionIds,  # 🔵 Yangi qo‘shilgan maydon
                 "subject1_name": subject1_name,
                 "subject2_name": subject2_name,
                 "subject_scores": {
@@ -241,7 +259,6 @@ class CheckAnswersAPIView(APIView):
 
         except Exception as e:
             return Response({"status": "error", "message": str(e)}, status=500)
-
 
 class CheckDiagnostikaSubjectsAPIView(APIView):
     def get(self, request):
@@ -259,3 +276,69 @@ class CheckDiagnostikaSubjectsAPIView(APIView):
 
         # Agar hech qanday fan bog‘lanmagan bo‘lsa, bo‘sh ro‘yxat qaytariladi
         return JsonResponse({"subjects": list(subjects)})
+
+
+class TestAnalysisAPIView(APIView):
+    def get(self, request):
+        user_id = request.GET.get("user_id")
+        diagnostika_id = request.GET.get("diagnostika_id")
+
+        if not user_id or not diagnostika_id:
+            return Response({"status": "error", "message": "Ma'lumot yetarli emas!"}, status=HTTP_400_BAD_REQUEST)
+
+        # ✅ User ID ni User modelidan olish
+        user = User.objects.filter(user_id=user_id).first()
+        if not user:
+            return Response({"status": "error", "message": "Foydalanuvchi topilmadi!"}, status=HTTP_404_NOT_FOUND)
+
+        # ✅ Foydalanuvchining natijasini olish
+        result = Result.objects.filter(diagnostika_id=diagnostika_id, user=user).first()
+        if not result:
+            return Response({"status": "error", "message": "Natijalar topilmadi!"}, status=HTTP_404_NOT_FOUND)
+
+        # ✅ Shu diagnostikaga ishtirok qilganlar soni
+        participant_count = Result.objects.filter(diagnostika_id=diagnostika_id).count()
+
+        # ✅ Ishlangan savollar ID'sini olish
+        all_question_ids = result.all_answer_ids  # `{question_id: [answers]}`
+
+        # ✅ Test tahlilini tayyorlash
+        test_analysis = []
+        for question_id, answer_order in all_question_ids.items():
+            question = Question.objects.filter(id=question_id).first()
+            if not question:
+                continue
+
+            # ✅ Foydalanuvchi tanlagan javob
+            user_answer_id = next((a for a in result.correct_answer_ids + result.wrong_answer_ids if a in answer_order), None)
+
+            # ✅ Savolga tegishli variantlarni chiqarish (to‘g‘ri tartibda)
+            answers = Answer.objects.filter(id__in=answer_order)
+            ordered_answers = sorted(answers, key=lambda x: answer_order.index(x.id))
+
+            # ✅ Ma'lumotlarni ro‘yxatga qo‘shish
+            test_analysis.append({
+                "question_id": question.id,
+                "question_text": question.question_text,
+                "image": question.image,
+                "answers": [
+                    {
+                        "id": answer.id,
+                        "text": answer.text,
+                        "is_correct": answer.is_correct
+                    } for answer in ordered_answers
+                ],
+                "user_answer_id": user_answer_id,  # ✅ Belgilangan javob
+                "correct_answer_id": next((a.id for a in ordered_answers if a.is_correct), None),
+            })
+
+        # ✅ `duration_time`, `participant_count`, `fan nomlari` ni JSON response'ga qo‘shamiz
+        return Response({
+            "status": "success",
+            "duration_time": result.duration_time,  # ⏳ Test davomiyligi
+            "participant_count": participant_count,  # 👥 Ishtirokchilar soni
+            "subject1_name": result.subject1_name,  # 🎯 1-fan nomi
+            "subject2_name": result.subject2_name,  # 🎯 2-fan nomi
+            "mandatory_subject_name": "Majburiy fan",  # 🎯 Majburiy fan nomi (agar bazada yo‘q bo‘lsa statik qo‘yamiz)
+            "test_analysis": test_analysis
+        }, status=HTTP_200_OK)

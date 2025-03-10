@@ -1,19 +1,10 @@
 import os
-
 from pathlib import Path
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
 SECRET_KEY = 'django-insecure-w(zfjc0p(i*#cs-egz38=5re5cmf-opa-k3y%zny8n9y@i*ijs'
-
 DEBUG = True
-
-ALLOWED_HOSTS = ['b361-92-63-205-138.ngrok-free.app', 'localhost', '127.0.0.1']
-
-CSRF_TRUSTED_ORIGINS = ['https://b361-92-63-205-138.ngrok-free.app']
-
-
+ALLOWED_HOSTS = ['54cb-185-139-138-210.ngrok-free.app', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://54cb-185-139-138-210.ngrok-free.app']
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True

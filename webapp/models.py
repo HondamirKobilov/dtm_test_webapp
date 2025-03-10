@@ -111,7 +111,14 @@ class Result(models.Model):
     correct_answers_subject2 = models.IntegerField(default=0)  # 2-fan to‘g‘ri javoblar soni
     correct_answers_mandatory = models.IntegerField(default=0)  # Majburiy fan to‘g‘ri javoblar soni
     total_score = models.FloatField(default=0)  # Jami ball
-    completed_at = models.DateTimeField(auto_now_add=True)  # Yakunlangan vaqti (18.06.2024 19:17)
+    completed_at = models.DateTimeField(auto_now_add=True)  # Yakunlangan vaqti
+
+    all_answer_ids = models.JSONField(default=list)
+    correct_answer_ids = models.JSONField(default=list)  # ✅ To‘g‘ri javoblar ID lari
+    wrong_answer_ids = models.JSONField(default=list)  # ✅ Noto‘g‘ri javoblar ID lari
+
+
+    duration_time = models.CharField(max_length=8, default="00:00:00")   # ⏳ Testni qancha vaqt bajargan
 
     class Meta:
         managed = False
@@ -119,6 +126,7 @@ class Result(models.Model):
 
     def __str__(self):
         return f"{self.user.fullname} - {self.diagnostika.name} - {self.total_score} ball"
+
 class DiagnostikaSubjectAssociation(models.Model):
     diagnostika = models.ForeignKey("Diagnostika", on_delete=models.CASCADE)
     subject = models.ForeignKey("Subject", on_delete=models.CASCADE)

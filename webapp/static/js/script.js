@@ -17,7 +17,8 @@ function fixLatexFormulas(latex) {
 }
 
 let selectedSubjects = {};
-let diaginostikaId = null;
+let allQuestionIds = {};
+
 document.addEventListener("DOMContentLoaded", function () {
    let diagnostikaContainer = document.getElementById("diagnostika-list");
    let examContainer = document.getElementById("exam-container");
@@ -29,26 +30,25 @@ document.addEventListener("DOMContentLoaded", function () {
    let startExamButton = document.querySelector(".start-button1");
    let questionsDiv = document.getElementById("questions");
    let testContainer = document.getElementById("test-container");
+   let backToHomeBottom = document.getElementById("backToHomeBottom");
 
-   const frontHost = "https://b361-92-63-205-138.ngrok-free.app"
-   const tg = window.Telegram.WebApp;
-   tg.ready();
-   const userId = tg.initDataUnsafe.user.id;
+   const frontHost = "https://54cb-185-139-138-210.ngrok-free.app"
+   // const tg = window.Telegram.WebApp;
+   // tg.ready();
+   // const userId = tg.initDataUnsafe.user.id;
 
-   // let userId = 1405814595;
+   let userId = 5958755374;
     // ✅ Diagnostikalar ro‘yxatini yuklash
     console.log("UserID>>>", userId)
     fetch(`/api/diagnostikas/`)
         .then(response => response.json())
         .then(async data => {
             diagnostikaContainer.innerHTML = "";
-
             if (data.diagnostikalar.length === 0) {
                 console.log("salomim")
                 diagnostikaContainer.innerHTML = "<p class='empty-message'>📌 Hozircha diagnostikalar mavjud emas.</p>";
                 return;
             }
-
             let diagnostikaPromises = data.diagnostikalar.map(diagnostika =>
                 Promise.all([
                     fetch(`${frontHost}/api/check-user-result/?user_id=${userId}&diagnostika_id=${diagnostika.id}`)
@@ -93,14 +93,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             // ✅ Tugmalarni faollashtirish
-            document.querySelectorAll(".start-button").forEach(button => {
-                button.addEventListener("click", function () {
-                    let hasResult = this.getAttribute("data-result") === "true";
-                    let diagnostikaId = this.getAttribute("data-id"); // ✅ Diagnostika ID ni olish
-                    let isActive = this.getAttribute("data-status") === "true";
+            document.addEventListener("click", function (event) {
+                let clickedElement = event.target; // Bosilgan elementni aniqlaymiz
+
+                // 🟢 Agar `.start-button` bosilgan bo‘lsa
+                if (clickedElement.classList.contains("start-button")) {
+                    let hasResult = clickedElement.getAttribute("data-result").trim() === "true";
+                    let diagnostikaId = clickedElement.getAttribute("data-id"); // ✅ Diagnostika ID ni olish
+                    let isActive = clickedElement.getAttribute("data-status").trim() === "true";
                     localStorage.setItem("diagnostika_id", diagnostikaId);
-                    // let status = this.getAttribute("data-status") === "true";
                     if (hasResult || !isActive) {
+                        if (!isActive && hasResult) {
+                            document.getElementById("extraButton").style.display = "block";
+                        }
                         diagnostikaContainer.classList.add("hidden");
                         resultsContainer.classList.remove("hidden");
                         loadResults(diagnostikaId);
@@ -108,7 +113,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         diagnostikaContainer.classList.add("hidden");
                         examContainer.classList.remove("hidden");
                     }
-                });
+                }
+                else if (clickedElement.id === "results_end") {
+                    diagnostikaContainer.classList.add("hidden");
+                    resultsContainer.classList.remove("hidden");
+                    let diagnostikaId = localStorage.getItem("diagnostika_id");
+                    loadResults(diagnostikaId);
+                }
             });
         })
         .catch(error => {
@@ -121,15 +132,17 @@ document.addEventListener("DOMContentLoaded", function () {
             let response = await fetch(`${frontHost}/api/results/?diagnostika_id=${diagnostikaId}`);
             let data = await response.json();
             console.log("✅ API dan kelgan natijalar:", data);
-            if (!data.results.length) {
-                console.log("❌ Natijalar topilmadi!");
-                resultsContainer.innerHTML = "<p class='error-message'>❌ Natijalar yo‘q</p>";
-                return;
+            console.log(data.results.length)
+            if (data.results.length === 0) {
+                resultsBody.innerHTML = "<p>[null]</p>"
             }
-            resultsTitle.textContent = `Diagnostik imtihon #${diagnostikaId}`;
-            allResults = data.results; // 📌 Natijalarni saqlaymiz
-            populateSubjects(allResults); // 🔹 Dropdownlarni to‘ldiramiz
-            renderResults(allResults); // 🔹 Barcha natijalarni chiqaramiz
+            else {
+                resultsTitle.textContent = `Diagnostik imtihon #${diagnostikaId}`;
+                allResults = data.results; // 📌 Natijalarni saqlaymiz
+                populateSubjects(allResults); // 🔹 Dropdownlarni to‘ldiramiz
+                renderResults(allResults); // 🔹 Barcha natijalarni chiqaramiz
+            }
+
 
         } catch (error) {
             console.error("Xatolik:", error);
@@ -235,6 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('foreign-language-container').style.display = 'none';
         document.getElementById('foreign-language').selectedIndex = 0;
     });
+
     backmenu.addEventListener("click", function () {
         examContainer.classList.add("hidden");
         diagnostikaContainer.classList.remove("hidden");
@@ -281,7 +295,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             return array;
         }
-
         let requestData = {
             subject1: subject1,
             subject2: subject2,
@@ -314,22 +327,24 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     })
                     .catch(error => console.error("Xatolik:", error));
-
                 data.questions.forEach(subjectData => {
                     let subjectTitle = document.createElement("h2");
                     subjectTitle.textContent = subjectData.subject_name;
                     subjectTitle.classList.add("exam-title");
                     questionsDiv.appendChild(subjectTitle);
 
-                    let shuffledQuestions = shuffleArray(subjectData.questions);
+                    let shuffledQuestions = shuffleArray(subjectData.questions); // ✅ Savollarni aralashtiramiz
 
                     shuffledQuestions.forEach((question) => {
-
                         let questionBlock = document.createElement("div");
                         questionBlock.className = "exam-card";
-
                         questionBlock.id = `q${startNumber}`;
-                        let shuffledAnswers = shuffleArray(question.answers); // ❌ HAR BIR SAVOLNI RANDOM QILISH TO‘G‘RI
+
+                        let shuffledAnswers = shuffleArray(question.answers); // ✅ Variantlarni aralashtiramiz
+
+                        // ✅ Savolga tegishli variantlarni saqlash
+                        allQuestionIds[question.id] = shuffledAnswers.map(answer => answer.id);
+
                         questionBlock.innerHTML = `
                             <p><strong>${startNumber}.</strong> ${fixLatexFormulas(question.question_text)}</p> 
                             ${question.image ? `<img src="${question.image}" alt="Rasm" width="50%">` : ""}
@@ -342,11 +357,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                 `).join("")}
                             </div>
                         `;
+
                         questionsDiv.appendChild(questionBlock);
                         startNumber++;
                     });
                 });
-
                 document.querySelectorAll(".answers input[type='radio']").forEach(radio => {
                     radio.addEventListener("change", function () {
                         let questionNumber = this.name.replace("q", ""); // Masalan: q5 -> 5
@@ -564,6 +579,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let cancelFinish = document.getElementById("cancelFinish");
     let testResultModal = document.getElementById("testResultModal");
     let exitTest = document.getElementById("exitTest");
+    let results_end = document.getElementById("results_end");
+    let testContainer = document.getElementById("test-container");
 
     let testStartTime = Date.now(); // ✅ Test boshlanish vaqtini saqlash
 
@@ -585,13 +602,19 @@ document.addEventListener("DOMContentLoaded", function () {
     exitTest.addEventListener("click", function () {
         testResultModal.style.display = "none";
     });
+    results_end.addEventListener("click", function () {
+        testResultModal.style.display = "none";
+        testContainer.style.display = "none";
+        location.reload();
+    });
 
     function checkTestResults() {
         let endTime = Date.now();
-        let totalTime = Math.floor((endTime - testStartTime) / 1000);
-        let minutes = Math.floor(totalTime / 60);
+        let totalTime = Math.floor((endTime - testStartTime) / 1000); // ✅ Sekundga o'tkazish
+        let hours = Math.floor(totalTime / 3600); // ⏳ Soatlar
+        let minutes = Math.floor((totalTime % 3600) / 60); // ⏳ Daqiqalar
         let seconds = totalTime % 60;
-        document.getElementById("spent-time").textContent = `${minutes}m ${seconds}s`;
+        let duration_time = document.getElementById("spent-time").textContent = `${hours}:${minutes}:${seconds}`;
 
         let selectedAnswers = [];
         let totalQuestions = document.querySelectorAll(".exam-card").length;
@@ -608,13 +631,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
+
         // ✅ Telegram Web App orqali user_id olish
         const frontHost = "https://ffcf-185-139-138-139.ngrok-free.app"
         const tg = window.Telegram.WebApp;
         tg.ready();
         const userId = tg.initDataUnsafe.user.id;
 
-        // let userId = 1405814595;
+        // let userId = 5958755374;
         let diagnostikaId = selectedSubjects.diaginostika_id;
         console.log(diagnostikaId)
         // ✅ Foydalanuvchining natijalarini serverga yuborish
@@ -627,7 +651,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 subject1_name: selectedSubjects.subject1 || "Fan 1",
                 subject2_name: selectedSubjects.subject2 || "Fan 2",
                 answers: selectedAnswers,
-                total_questions: totalQuestions
+                total_questions: totalQuestions,
+                allQuestionIds: allQuestionIds,
+                duration_time: duration_time
             })
         })
         .then(response => response.json())
@@ -638,7 +664,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("total-score").textContent = data.total_score;
                 document.getElementById("subject1-name").textContent = data.subject1_name;
                 document.getElementById("subject2-name").textContent = data.subject2_name;
-
                 // document.getElementById("mandatory-name").textContent = "Majburiy fanlar";
                 document.getElementById("subject1-correct").textContent = `${data.subject_scores?.fan_1?.correct || 0} ta`;
                 document.getElementById("subject2-correct").textContent = `${data.subject_scores?.fan_2?.correct || 0} ta`;
@@ -664,22 +689,182 @@ document.addEventListener("DOMContentLoaded", function () {
     let examContainer = document.getElementById("exam-container"); // 📌 Fan tanlash sahifasi
     let testContainer = document.getElementById("test-container"); // 📌 Test sahifasi
     let questionsDiv = document.getElementById("questions");
-    exitTest.addEventListener("click", function () {
+    function closeTestResults() {
         // ✅ Natijalar oynasini yopish
         testResultModal.style.display = "none";
 
         // ✅ Test sahifasini va fan tanlash menyusini yashirish
         testContainer.classList.add("hidden");
         examContainer.classList.add("hidden");
-
         // ✅ Diagnostika tanlash menyusini qayta ko‘rsatish
         diagnostikaContainer.classList.remove("hidden");
-
-        // ✅ Test savollarini tozalash (eski test qoldiqlari qolib ketmasligi uchun)
         questionsDiv.innerHTML = "";
         location.reload();
+    }
+    document.getElementById("exitTest").addEventListener("click", closeTestResults);
 
-    });
+});
+document.getElementById("extraButton").addEventListener("click", async function () {
+    let diagnostikaId = localStorage.getItem("diagnostika_id");
+    let examContainer = document.getElementById("exam-container");
+    let testContainer = document.getElementById("test-container");
+    let testButtonsDiv = document.getElementById("test-buttons"); // ✅ Tugmalar div
+    let backToHomeBottom = document.getElementById("backToHomeBottom"); // ✅ Tugmalar div
+    backToHomeBottom.classList.remove("hidden");
+    document.querySelector(".finish-button").style.display = "none";
+    const frontHost = "https://54cb-185-139-138-210.ngrok-free.app";
+
+    let userId = 5958755374;
+
+    if (!diagnostikaId || !userId) {
+        alert("⚠️ Foydalanuvchi yoki diagnostika aniqlanmadi!");
+        return;
+    }
+
+    try {
+        let response = await fetch(`${frontHost}/api/test-analysis/?diagnostika_id=${diagnostikaId}&user_id=${userId}`);
+
+        if (!response.ok) {
+            console.error(`❌ Server xatosi: ${response.status} - ${response.statusText}`);
+            alert("⚠️ Natijalarni yuklashda xatolik!");
+            return;
+        }
+
+        let data = await response.json();
+        console.log("📌 API dan kelgan test tahlili:", data);
+
+        if (!data.test_analysis || data.test_analysis.length === 0) {
+            console.error("❌ API noto‘g‘ri formatda ma'lumot qaytardi!");
+            alert("⚠️ Test natijalari topilmadi!");
+            return;
+        }
+
+        document.getElementById("resultsContainer").classList.add("hidden");
+        document.getElementById("exam-container").classList.add("hidden");
+        document.getElementById("test-container").classList.remove("hidden");
+
+        let timerElement = document.getElementById("sticky-timer");
+        let remainingTimeElement = document.getElementById("remaining-time");
+
+        for (let i = 1; i < 99999; i++) window.clearInterval(i);
+
+        if (timerElement && remainingTimeElement) {
+            timerElement.textContent = data.duration_time;
+            remainingTimeElement.textContent = data.duration_time;
+        }
+
+        let participantElement = document.getElementById("participant-count");
+        if (participantElement) {
+            participantElement.textContent = data.participant_count;
+        }
+
+        let questionsDiv = document.getElementById("questions");
+        if (!questionsDiv) {
+            console.error("❌ Xatolik: `questions` div topilmadi!");
+            return;
+        }
+
+        questionsDiv.innerHTML = "";
+        testButtonsDiv.innerHTML = ""; // ✅ Tugmalarni tozalash
+
+        const subjects = [
+            data.subject1_name,
+            data.subject2_name,
+            "Ona tili va adabiyot",
+            "Tarix",
+            "Matematika"
+        ];
+
+        let startNumber = 1;
+        let currentSubjectIndex = 0;
+
+        data.test_analysis.forEach((question, index) => {
+            if (!question.answers || question.answers.length === 0) {
+                console.warn(`❌ ${question.question_id} ID lik savol variantlarsiz kelgan!`);
+                return;
+            }
+
+            if (index === 0 || index === 30 || index === 60 || index === 70 || index === 80) {
+                let subjectTitle = document.createElement("h2");
+                subjectTitle.textContent = subjects[currentSubjectIndex];
+                subjectTitle.classList.add("exam-title");
+                questionsDiv.appendChild(subjectTitle);
+                currentSubjectIndex++;
+            }
+
+            let questionBlock = document.createElement("div");
+            questionBlock.className = "exam-card";
+            questionBlock.id = `q${startNumber}`; // 🟢 Har bir savolning ID si kiritildi
+
+            let selectedAnswerId = question.user_answer_id;
+            let correctAnswerId = question.correct_answer_id;
+
+            let buttonClass = "";
+            if (selectedAnswerId === correctAnswerId) {
+                buttonClass = "correct-btn"; // ✅ To‘g‘ri javob yashil
+            } else if (selectedAnswerId !== null && selectedAnswerId !== correctAnswerId) {
+                buttonClass = "wrong-btn"; // ❌ Noto‘g‘ri javob qizil
+            } else {
+                buttonClass = ""; // ⚪ Ishlanmagan rangsiz qoladi
+            }
+
+            let navButton = document.createElement("button");
+            navButton.textContent = startNumber;
+            navButton.className = `test-nav-btn ${buttonClass}`;
+            navButton.dataset.questionId = `q${startNumber}`;
+
+            testButtonsDiv.appendChild(navButton);
+
+            // ✅ Tugmani bosganda mos testga o'tish funksiyasi 100% ishlaydi
+            navButton.addEventListener("click", function () {
+                let questionElement = document.getElementById(this.dataset.questionId);
+                if (questionElement) {
+                    questionElement.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            });
+
+            let answerHTML = question.answers.map(answer => {
+                let isSelected = selectedAnswerId === answer.id;
+                let isCorrect = correctAnswerId === answer.id;
+                let icon = "";
+
+                if (isSelected && isCorrect) {
+                    icon = " ✅";
+                } else if (isSelected && !isCorrect) {
+                    icon = " ❌";
+                }
+
+                return `
+                    <label>
+                        <input type="radio" name="q${startNumber}" value="${answer.id}" ${isSelected ? "checked" : ""} disabled>
+                        ${fixLatexFormulas(answer.text)} <strong>${icon}</strong>
+                    </label>
+                `;
+            }).join("");
+
+            questionBlock.innerHTML = `
+                <p><strong>${startNumber}.</strong> ${fixLatexFormulas(question.question_text)}</p> 
+                ${question.image ? `<img src="${question.image}" alt="Rasm" width="50%">` : ""}
+                <div class="answers">
+                    ${answerHTML}
+                </div>
+            `;
+            questionsDiv.appendChild(questionBlock);
+            startNumber++;
+        });
+
+        MathJax.typesetPromise().then(() => {
+            console.log("✅ MathJax formulalarni yangiladi");
+        }).catch((err) => console.error("❌ MathJax xatolik berdi:", err));
+
+    } catch (error) {
+        console.error("❌ Xatolik:", error);
+        alert("⚠️ Server bilan bog‘lanishda muammo!");
+    }
 });
 
-// JS tomo
+document.getElementById("backToHomeBottom").addEventListener("click", function () {
+    location.reload();
+});
+
+

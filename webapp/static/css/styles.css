@@ -1521,5 +1521,110 @@ tr:hover {
         font-size: 14px; /* Font o'lchamini sozlash */
     }
 }
+/* 🔵 **Tanlangan radio tugmani ko‘k rangda qilish** */
+.answers input[type="radio"]:checked {
+    accent-color: #007bff; /* ✅ Ko‘k rang */
+    border-color: #007bff !important; /* ✅ Ko‘k ramka */
+    background-color: #007BFF;
+}
 
-/*media qismi*/
+/* 🔵 **`disabled` bo‘lsa ham ko‘k bo‘lib tursin** */
+.answers input[type="radio"]:checked:disabled {
+    accent-color: #007bff; /* ✅ Ko‘k rang */
+    border-color: #007bff !important;
+    opacity: 1; /* 🔹 `disabled` radio tugmalar tiniq bo‘lib tursin */
+}
+
+.correct-btn {
+    background-color: #43e367 !important; /* ✅ Yashil */
+    color: white;
+}
+
+.wrong-btn {
+    background-color: #cc1929 !important; /* ❌ Qizil */
+    color: white;
+}
+
+.test-nav-btn {
+    margin: 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+/* ✅ Ortga qaytish tugmasi dizayni */
+.back-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 15px;
+    transition: 0.3s;
+}
+
+.back-btn:hover {
+    background-color: #0056b3;
+}
+
+/* ✅ Tugmalar default holatda yashirin bo‘ladi */
+.hidden {
+    display: none;
+}
+
+/* ✅ Mobil qurilmalarda pastga joylashishi */
+@media screen and (max-width: 1023px) {
+    #backToHomeBottom {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        z-index: 1000;
+    }
+}
+
+
+/*@media screen and (min-width: 1024px) {*/
+/*    #test-container {*/
+/*        display: flex;*/
+/*        justify-content: space-between;*/
+/*    }*/
+
+/*    #questions {*/
+/*        width: 70%; !* Savollar uchun kenglik *!*/
+/*    }*/
+
+/*    #test-buttons-container {*/
+/*        width: 28%;*/
+/*        position: sticky;*/
+/*        top: 10px;*/
+/*    }*/
+
+/*    #test-buttons {*/
+/*        display: grid;*/
+/*        grid-template-columns: repeat(10, 1fr);*/
+/*        gap: 5px;*/
+/*        padding: 10px;*/
+/*    }*/
+/*}*/
+
+/*!* ✅ Mobil va planshet versiya *!*/
+/*@media screen and (max-width: 1023px) {*/
+/*    #test-buttons-container {*/
+/*        width: 100%;*/
+/*        margin-top: 20px;*/
+/*    }*/
+
+/*    #test-buttons {*/
+/*        display: grid;*/
+/*        grid-template-columns: repeat(5, 1fr); !* Mobil va planshet uchun 5 ustun *!*/
+/*        gap: 5px;*/
+/*        padding: 10px;*/
+/*    }*/
+/*}*/

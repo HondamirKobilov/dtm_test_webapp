@@ -69,12 +69,23 @@
 
     <!-- Test sahifasi -->
     <main class="container hidden" id="test-container">
-        <div id="questions"></div>
-        <div id="sticky-timer">03:00:00</div>
-        <div id="test-navigation">
-            <h3>DTM online test topshirish 2025</h3>
-            <div id="test-buttons"></div>
+        <!-- ✅ Bosh sahifaga qaytish tugmasi (test tahlili boshlanganida chiqadi) -->
+        <button id="backToHomeTop" class="back-btn hidden">⬅️ Bosh sahifaga qaytish</button>
+    
+        <div class="test-content">
+            <!-- ✅ Chap tomondagi savollar qismi -->
+            <div id="questions-container">
+                <div id="questions"></div>
+            </div>
+    
+            <!-- ✅ O‘ng tomonda doimiy joylashgan navigatsiya qismi -->
+            <div id="test-navigation">
+                <h3>DTM online test topshirish 2025</h3>
+                <div id="test-buttons"></div>
+            </div>
         </div>
+    
+        <!-- ✅ Muzlab turadigan footer -->
         <div id="test-footer">
             <div class="test-info">
                 <div>
@@ -86,9 +97,15 @@
                     <p>Ishtirokchilar</p>
                 </div>
             </div>
+    
             <button class="finish-button">Testni yakunlash</button>
+    
+            <!-- ✅ Oxirida yana qaytish tugmasi -->
+            <button id="backToHomeBottom" class="back-btn hidden">⬅️ Bosh sahifaga qaytish</button>
         </div>
     </main>
+
+
 
     <!-- 1-Modal: Testni tasdiqlash -->
     <div id="finishTestModal" class="modal">
@@ -158,8 +175,7 @@
     
             <!-- Pastdagi tugmalar -->
             <div class="modal-actions">
-                <button class="secondary-button">Natijalar jadvali</button>
-                <button class="secondary-button">Test tahlili</button>
+                <button class="secondary-button" id="results_end">Natijalar jadvali</button>
                 <button id="exitTest" class="confirm-button">Testdan chiqish</button>
             </div>
         </div>
@@ -179,7 +195,7 @@
                 </select>
             </div>
         </div>
-
+        <button id="extraButton" style="display: none;">Test tahlili</button>
         <table class="results-table">
             <thead>
                 <tr>
@@ -196,6 +212,7 @@
         </table>
         
     </div>
+    <div id="questionsDiv"></div>
     <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
