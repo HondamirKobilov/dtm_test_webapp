@@ -90,12 +90,12 @@ class DiagnostikaResultsAPIView(APIView):
         users = User.objects.filter(id__in=user_ids).values("id", "fullname")
 
         # 3️⃣ user_id -> fullname uchun dictionary hosil qilish
-        user_dict = {user["id"]: user["fullname"] for user in users}
+        user_dict = {user["id"]: {"fullname": user["fullname"], "phone": user["phone"]} for user in users}
 
         # 4️⃣ Yakuniy natijalar ro‘yxatini yaratish
         results_data = [
             {
-                "participant": "+998997796202",  # Static telefon raqam
+                "participant": user_dict.get(r.user_id, {}).get("phone", "Telefon mavjud emas"),
                 "full_name": user_dict.get(r.user_id, "Ism mavjud emas"),  # ✅ fullname olish
                 "subject1_score": r.correct_answers_subject1,
                 "subject1_name": r.subject1_name,
