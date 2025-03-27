@@ -32,12 +32,12 @@ document.addEventListener("DOMContentLoaded", function () {
    let testContainer = document.getElementById("test-container");
    let backToHomeBottom = document.getElementById("backToHomeBottom");
 
-   const frontHost = "https://mandatuz.uz"
-   const tg = window.Telegram.WebApp;
-   tg.ready();
-   const userId = tg.initDataUnsafe.user.id;
+   const frontHost = "https://2c68-185-139-138-219.ngrok-free.app"
+   // const tg = window.Telegram.WebApp;
+   // tg.ready();
+   // const userId = tg.initDataUnsafe.user.id;
 
-   // let userId = 5958755374;
+   let userId = 1405814595;
     // ✅ Diagnostikalar ro‘yxatini yuklash
     console.log("UserID>>>", userId)
     fetch(`/api/diagnostikas/`)
@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
             diagnostikaList.forEach(diagnostika => {
                 // let buttonText = diagnostika.hasResult ? "Natijalar" : "Test topshirish";
                 let buttonText;
+                console.log()
                 if (!diagnostika.status || diagnostika.hasResult) {
                     buttonText = "Natijalar"; // 🔹 Diagnostika tugagan yoki user qatnashgan
                 } else {
@@ -138,9 +139,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             else {
                 resultsTitle.textContent = `Diagnostik imtihon #${diagnostikaId}`;
-                allResults = data.results; // 📌 Natijalarni saqlaymiz
-                populateSubjects(allResults); // 🔹 Dropdownlarni to‘ldiramiz
-                renderResults(allResults); // 🔹 Barcha natijalarni chiqaramiz
+                allResults = data.results;
+                populateSubjects(allResults);
+                renderResults(allResults);
             }
 
 
@@ -262,7 +263,6 @@ document.addEventListener("DOMContentLoaded", function () {
         let subject1 = document.getElementById("subject1").value;
         let subject2 = document.getElementById("subject2").value;
         let foreignLanguage = document.getElementById("foreign-language").value;
-
         if (!subject1 || !subject2) {
             alert("Iltimos, ikkita mutaxassislik fanini tanlang!");
             return;
@@ -272,6 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("⚠️ Bu diaginostikaga test joylanmagan! Iltimos, boshqa diagnostikani tanlang.");
             return;
         }
+
         let checkSubjectsResponse = await fetch(`/api/check-diagnostika-subjects/?diagnostika_id=${diagnostikaId}`);
         let checkSubjectsData = await checkSubjectsResponse.json();
 
@@ -280,10 +281,25 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("⚠️ Hali test joylanmagan!");
             return;
         }
+        if (subject1 === "Chet tili") {
+            subject1 = foreignLanguage;
+        }
 
-        // **Tanlangan fanlar diagnostika bo‘yicha mavjudligini tekshirish**
+        // ✅ Agar Chet tili 2-fan bo‘lsa
+        if (subject2 === "Chet tili") {
+            subject2 = foreignLanguage;
+        }
+        let requestData = {
+            subject1: subject1,
+            subject2: subject2,
+            diaginostika_id: diagnostikaId
+        };
+        selectedSubjects.subject1 = subject1;
+        selectedSubjects.subject2 = subject2;
+        selectedSubjects.diaginostika_id = diagnostikaId;
+
         let availableSubjects = checkSubjectsData.subjects.map(subject => subject.name);
-
+        console.log("1-fan>>", subject1, "2-fan>>", subject2)
         if (!availableSubjects.includes(subject1) || !availableSubjects.includes(subject2)) {
             alert("⚠️ Bu fanlar bo‘yicha hali testlar joylanmagan!");
             return;
@@ -295,14 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             return array;
         }
-        let requestData = {
-            subject1: subject1,
-            subject2: subject2,
-            diaginostika_id: diagnostikaId
-        };
-        selectedSubjects.subject1 = subject1;
-        selectedSubjects.subject2 = subject2;
-        selectedSubjects.diaginostika_id = diagnostikaId;
+
         if (document.getElementById("foreign-language-container").style.display === "block" && foreignLanguage) {
             requestData.foreign_language = foreignLanguage;
         }
@@ -490,13 +499,23 @@ function checkForeignLanguage() {
 
 
 let testStartTime = null;
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     let startTime = 3 * 60 * 60; // ⏳ 3 soat (sekundlarda)
-    let timeElement = document.getElementById("remaining-time");
+    let timerElement = document.getElementById("remaining-time");
     let stickyTimer = document.getElementById("sticky-timer");
     let participantElement = document.getElementById("participant-count");
     let testButtonsDiv = document.getElementById("test-buttons");
-    testStartTime = Date.now();
+    let extraButton = document.getElementById("extraButton"); // ❗ Extra tugmani olish
+    let startButton = document.querySelector(".start-button1");
+    let timerActive = true; // Timer holatini tekshirish uchun
+    let timerInterval; // Interval ID saqlash
+    const frontHost = "https://2c68-185-139-138-219.ngrok-free.app"
+    let diagnostikaId = localStorage.getItem("diagnostika_id");
+   // const tg = window.Telegram.WebApp;
+   // tg.ready();
+   // const userId = tg.initDataUnsafe.user.id;
+
+    let userId = 1405814595;
     function formatTime(seconds) {
         let hours = Math.floor(seconds / 3600);
         let minutes = Math.floor((seconds % 3600) / 60);
@@ -505,14 +524,38 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateTimer() {
-        if (startTime > 0) startTime -= 1; // ⏳ Har 5 sekundda 5 soniya kamaytirish
-        let formattedTime = formatTime(startTime);
-        timeElement.textContent = formattedTime;
-        stickyTimer.textContent = formattedTime; // ✅ Sticky taymer ham yangilanadi
+        if (timerActive && startTime > 0) {
+            startTime -= 1;
+            let formattedTime = formatTime(startTime);
+            timerElement.textContent = formattedTime;
+            console.log("pppp>>>>>>", formattedTime)
+            stickyTimer.textContent = formattedTime; // ✅ Sticky taymer ham yangilanadi
+        }
     }
 
-    // **Har 5 sekundda ikkalasini ham yangilash**
-    setInterval(updateTimer, 1000);
+    // **Taymerni har 1 sekundda ishlatish**
+    function startTimer() {
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+    startButton.addEventListener("click", function () {
+        startTimer();
+    });
+    console.log("odamlar nima deydi")
+    let response = await fetch(`${frontHost}/api/test-analysis/?diagnostika_id=${diagnostikaId}&user_id=${userId}`);
+    let data = await response.json();
+    console.log("Kelgan data:", data);
+    extraButton.addEventListener("click", function () {
+        if (timerActive) {
+            clearInterval(timerInterval); // ⏸ Timer to'xtatilad
+            timerElement.textContent = data.duration_time;
+            remainingTimeElement.textContent = data.duration_time;
+            console.log(timeElement.textContent)
+            timerActive = false;
+        } else {
+            startTimer(); // ▶️ Timer qayta ishga tushadi
+            timerActive = true;
+        }
+    });
 
     fetch("/api/diagnostikas/")
         .then(response => response.json())
@@ -539,18 +582,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         testButtonsDiv.appendChild(button);
     }
+
     // ✅ **Variant tanlanganda mos keluvchi tugmani ko‘k qilish**
     function updateButtonColors() {
         document.querySelectorAll(".test-nav-btn").forEach(button => {
-            button.classList.remove("selected"); // 🔄 Avvalgi tanlangan tugmalardan "selected" klassini olib tashlaymiz
+            button.classList.remove("selected");
         });
 
         document.querySelectorAll(".exam-card input[type='radio']:checked").forEach(radio => {
-            let questionNumber = radio.name.replace("q", ""); // Masalan: q5 -> 5
+            let questionNumber = radio.name.replace("q", "");
             let relatedButton = document.querySelector(`.test-nav-btn[data-question="q${questionNumber}"]`);
 
             if (relatedButton) {
-                relatedButton.classList.add("selected"); // ✅ **Selected klass qo‘shiladi**
+                relatedButton.classList.add("selected");
             }
         });
     }
@@ -571,6 +615,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
 
 document.addEventListener("DOMContentLoaded", function () {
     let finishButton = document.querySelector(".finish-button");
@@ -632,12 +678,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // ✅ Telegram Web App orqali user_id olish
-        const frontHost = "https://ffcf-185-139-138-139.ngrok-free.app"
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        const userId = tg.initDataUnsafe.user.id;
+        // const frontHost = "https://b5ca-92-63-205-135.ngrok-free.app"
+        // const tg = window.Telegram.WebApp;
+        // tg.ready();
+        // const userId = tg.initDataUnsafe.user.id;
 
-        // let userId = 5958755374;
+        let userId = 1405814595;
         let diagnostikaId = selectedSubjects.diaginostika_id;
         console.log(diagnostikaId)
         // ✅ Foydalanuvchining natijalarini serverga yuborish
@@ -711,14 +757,14 @@ document.getElementById("extraButton").addEventListener("click", async function 
     let backToHomeBottom = document.getElementById("backToHomeBottom"); // ✅ Tugmalar div
     backToHomeBottom.classList.remove("hidden");
     document.querySelector(".finish-button").style.display = "none";
-    const frontHost = "https://mandatuz.uz";
+    const frontHost = "https://6e07-185-139-138-143.ngrok-free.app";
 
-    // let userId = 5958755374;
+    let userId = 1405814595;
     // const frontHost = "https://ffcf-185-139-138-139.ngrok-free.app"
 
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        const userId = tg.initDataUnsafe.user.id;
+        // const tg = window.Telegram.WebApp;
+        // tg.ready();
+        // const userId = tg.initDataUnsafe.user.id;
     if (!diagnostikaId || !userId) {
         alert("⚠️ Foydalanuvchi yoki diagnostika aniqlanmadi!");
         return;
@@ -732,7 +778,6 @@ document.getElementById("extraButton").addEventListener("click", async function 
             alert("⚠️ Natijalarni yuklashda xatolik!");
             return;
         }
-
         let data = await response.json();
         console.log("📌 API dan kelgan test tahlili:", data);
 
@@ -746,15 +791,7 @@ document.getElementById("extraButton").addEventListener("click", async function 
         document.getElementById("exam-container").classList.add("hidden");
         document.getElementById("test-container").classList.remove("hidden");
 
-        let timerElement = document.getElementById("sticky-timer");
-        let remainingTimeElement = document.getElementById("remaining-time");
 
-        for (let i = 1; i < 99999; i++) window.clearInterval(i);
-
-        if (timerElement && remainingTimeElement) {
-            timerElement.textContent = data.duration_time;
-            remainingTimeElement.textContent = data.duration_time;
-        }
 
         let participantElement = document.getElementById("participant-count");
         if (participantElement) {
@@ -768,7 +805,7 @@ document.getElementById("extraButton").addEventListener("click", async function 
         }
 
         questionsDiv.innerHTML = "";
-        testButtonsDiv.innerHTML = ""; // ✅ Tugmalarni tozalash
+        testButtonsDiv.innerHTML = "";
 
         const subjects = [
             data.subject1_name,

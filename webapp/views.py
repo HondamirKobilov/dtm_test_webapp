@@ -83,20 +83,23 @@ class DiagnostikaResultsAPIView(APIView):
         results = Result.objects.filter(diagnostika_id=diagnostika_id)
         user_ids = results.values_list("user_id", flat=True)
 
-        # if not user_ids:
-        #     return Response({"error": "Natijalar topilmadi!"}, status=status.HTTP_404_NOT_FOUND)
+        # 2️⃣ User ID lar orqali users jadvalidan fullname va phone ustunlarini olish
+        users = User.objects.filter(id__in=user_ids).values("id", "fullname", "phone")
 
-        # 2️⃣ User ID lar orqali users jadvalidan fullname ustunini olish
-        users = User.objects.filter(id__in=user_ids).values("id", "fullname")
-
-        # 3️⃣ user_id -> fullname uchun dictionary hosil qilish
-        user_dict = {user["id"]: {"fullname": user["fullname"], "phone": user["phone"]} for user in users}
+        # 3️⃣ user_id -> fullname va phone uchun dictionary hosil qilish
+        user_dict = {
+            user["id"]: {
+                "fullname": user["fullname"],
+                "phone": user.get("phone", "Telefon mavjud emas")
+            }
+            for user in users
+        }
 
         # 4️⃣ Yakuniy natijalar ro‘yxatini yaratish
         results_data = [
             {
                 "participant": user_dict.get(r.user_id, {}).get("phone", "Telefon mavjud emas"),
-                "full_name": user_dict.get(r.user_id, "Ism mavjud emas"),  # ✅ fullname olish
+                "full_name": user_dict.get(r.user_id, {}).get("fullname", "Ism mavjud emas"),  # ✅ fullname olish
                 "subject1_score": r.correct_answers_subject1,
                 "subject1_name": r.subject1_name,
                 "subject2_score": r.correct_answers_subject2,
@@ -110,6 +113,7 @@ class DiagnostikaResultsAPIView(APIView):
         ]
 
         return Response({"results": results_data}, status=status.HTTP_200_OK)
+
 
 class DiagnostikaTestAPIView(APIView):
     def post(self, request, diagnostika_id, *args, **kwargs):

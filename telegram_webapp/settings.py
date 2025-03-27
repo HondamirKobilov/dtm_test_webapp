@@ -3,8 +3,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-w(zfjc0p(i*#cs-egz38=5re5cmf-opa-k3y%zny8n9y@i*ijs'
 DEBUG = True
-ALLOWED_HOSTS = ['mandatuz.uz', 'localhost', '127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://mandatuz.uz']
+ALLOWED_HOSTS = ['2c68-185-139-138-219.ngrok-free.app', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://2c68-185-139-138-219.ngrok-free.app']
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
