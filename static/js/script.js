@@ -32,12 +32,12 @@ document.addEventListener("DOMContentLoaded", function () {
    let testContainer = document.getElementById("test-container");
    let backToHomeBottom = document.getElementById("backToHomeBottom");
 
-   const frontHost = "https://2c68-185-139-138-219.ngrok-free.app"
-   // const tg = window.Telegram.WebApp;
-   // tg.ready();
-   // const userId = tg.initDataUnsafe.user.id;
+   const frontHost = "https://mandatuz.uz"
+   const tg = window.Telegram.WebApp;
+   tg.ready();
+   const userId = tg.initDataUnsafe.user.id;
 
-   let userId = 1405814595;
+   // let userId = 1405814595;
     // ✅ Diagnostikalar ro‘yxatini yuklash
     console.log("UserID>>>", userId)
     fetch(`/api/diagnostikas/`)
@@ -509,7 +509,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     let startButton = document.querySelector(".start-button1");
     let timerActive = true; // Timer holatini tekshirish uchun
     let timerInterval; // Interval ID saqlash
-    const frontHost = "https://2c68-185-139-138-219.ngrok-free.app"
+    const frontHost = "https://mandatuz.uz"
     let diagnostikaId = localStorage.getItem("diagnostika_id");
    // const tg = window.Telegram.WebApp;
    // tg.ready();
@@ -678,12 +678,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // ✅ Telegram Web App orqali user_id olish
-        // const frontHost = "https://b5ca-92-63-205-135.ngrok-free.app"
-        // const tg = window.Telegram.WebApp;
-        // tg.ready();
-        // const userId = tg.initDataUnsafe.user.id;
+        const frontHost = "https://mandatuz.uz"
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        const userId = tg.initDataUnsafe.user.id;
 
-        let userId = 1405814595;
+        // let userId = 1405814595;
         let diagnostikaId = selectedSubjects.diaginostika_id;
         console.log(diagnostikaId)
         // ✅ Foydalanuvchining natijalarini serverga yuborish
@@ -757,14 +757,14 @@ document.getElementById("extraButton").addEventListener("click", async function 
     let backToHomeBottom = document.getElementById("backToHomeBottom"); // ✅ Tugmalar div
     backToHomeBottom.classList.remove("hidden");
     document.querySelector(".finish-button").style.display = "none";
-    const frontHost = "https://6e07-185-139-138-143.ngrok-free.app";
+    const frontHost = "https://mandatuz.uz";
 
-    let userId = 1405814595;
+    // let userId = 1405814595;
     // const frontHost = "https://ffcf-185-139-138-139.ngrok-free.app"
-
-        // const tg = window.Telegram.WebApp;
-        // tg.ready();
-        // const userId = tg.initDataUnsafe.user.id;
+        //
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    const userId = tg.initDataUnsafe.user.id;
     if (!diagnostikaId || !userId) {
         alert("⚠️ Foydalanuvchi yoki diagnostika aniqlanmadi!");
         return;
