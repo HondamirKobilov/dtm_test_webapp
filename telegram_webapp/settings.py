@@ -2,9 +2,9 @@ import os
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-w(zfjc0p(i*#cs-egz38=5re5cmf-opa-k3y%zny8n9y@i*ijs'
-DEBUG = True
-ALLOWED_HOSTS = ['2c68-185-139-138-219.ngrok-free.app', 'localhost', '127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://2c68-185-139-138-219.ngrok-free.app']
+DEBUG = False
+ALLOWED_HOSTS = ['mandatuz.uz', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://mandatuz.uz']
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
@@ -105,7 +105,7 @@ STATIC_URL = '/static/'
 
 # Statik fayllar joylashuvi
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "webapp/static"),
+    os.path.join(BASE_DIR, "webapp/../static"),
 ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
