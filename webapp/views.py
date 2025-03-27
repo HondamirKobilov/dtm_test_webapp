@@ -1,11 +1,14 @@
 import json
+import os
 
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import render, get_object_or_404
 from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from telegram_webapp import settings
 from .models import Diagnostika, Subject, Question, Answer, User, Result, DiagnostikaSubjectAssociation
 from .serializers import QuestionSerializer, AnswerSerializer
 from django.utils.timezone import now
@@ -13,6 +16,15 @@ from django.utils.timezone import now
 def home(request):
     diagnostikalar = Diagnostika.objects.all().order_by('-created_at')
     return render(request, 'index.html', {"diagnostikalar": diagnostikalar})
+
+def serve_css_file(request):
+    file_path = os.path.join(settings.BASE_DIR, 'static/css/my_styles.css')
+    return FileResponse(open(file_path, 'rb'), content_type='text/css')
+
+def serve_js_file(request):
+    file_path = os.path.join(settings.BASE_DIR, 'static/js/my_script.js')
+    return FileResponse(open(file_path, 'rb'), content_type='application/javascript')
+
 
 class DiagnostikaListAPIView(APIView):
     def get(self, request, *args, **kwargs):

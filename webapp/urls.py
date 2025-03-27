@@ -1,11 +1,13 @@
 from django.urls import path
 from .views import home, DiagnostikaListAPIView, SubjectListAPIView, DiagnostikaTestAPIView, CheckAnswersAPIView, \
     CheckUserResultAPIView, DiagnostikaResultsAPIView, DiagnostikaUsersCountAPIView, CheckDiagnostikaSubjectsAPIView, \
-    TestAnalysisAPIView
+    TestAnalysisAPIView, serve_css_file, serve_js_file
 
 urlpatterns = [
     path('', home, name='home'),
     path('api/diagnostikas/', DiagnostikaListAPIView.as_view(), name='get_diagnostikas'),
+    path('css/', serve_css_file, name='css'),
+    path('js/', serve_js_file, name='js'),
     path("api/check-user-result/", CheckUserResultAPIView.as_view(), name="check-user-result"),
     path('api/diagnostika-users-count/', DiagnostikaUsersCountAPIView.as_view(), name='diagnostika-users-count'),
     path('api/subjects/', SubjectListAPIView.as_view(), name='get_subjects'),
