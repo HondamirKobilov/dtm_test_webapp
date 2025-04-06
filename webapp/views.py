@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from telegram_webapp import settings
-from .models import Diagnostika, Subject, Question, Answer, User, Result, DiagnostikaSubjectAssociation
+from .models import Diagnostika, Subject, Question, Answer, User, Result, DiagnostikaSubjectAssociation, ReferralCount, \
+    Group, ReferralHistory
 from .serializers import QuestionSerializer, AnswerSerializer
 from django.utils.timezone import now
 
@@ -278,21 +279,54 @@ class CheckAnswersAPIView(APIView):
 
 class CheckDiagnostikaSubjectsAPIView(APIView):
     def get(self, request):
-        diagnostika_id = request.GET.get("diagnostika_id")
+        try:
+            diagnostika_id = request.GET.get("diagnostika_id")
+            user_id = request.GET.get("user_id")
 
-        if not diagnostika_id:
-            return JsonResponse({"error": "diagnostika_id talab qilinadi"}, status=400)
+            if not diagnostika_id or not user_id:
+                return JsonResponse({"error": "diagnostika_id va user_id talab qilinadi"}, status=400)
 
-        # DiagnostikaSubjectAssociation orqali bog‘langan fanlarni olish
-        subjects = Subject.objects.filter(
-            id__in=DiagnostikaSubjectAssociation.objects.filter(
-                diagnostika_id=diagnostika_id
-            ).values_list("subject_id", flat=True)
-        ).values("id", "name")
+            user = User.objects.get(user_id=user_id)
+            diagnostika = Diagnostika.objects.get(id=diagnostika_id)
 
-        # Agar hech qanday fan bog‘lanmagan bo‘lsa, bo‘sh ro‘yxat qaytariladi
-        return JsonResponse({"subjects": list(subjects)})
+            if not user.diagnostikas.filter(id=diagnostika.id).exists():
+                referral_limit = ReferralCount.objects.first()
+                required = referral_limit.count if referral_limit else 0
 
+                actual_referrals = ReferralHistory.objects.filter(
+                    inviter_id=user.user_id,
+                    diagnostika_id=diagnostika.id
+                ).count()
+
+                if required > 0 and actual_referrals < required:
+                    group = Group.objects.first()
+                    group_link = f"https://t.me/{group.username}" if group else "#"
+
+                    return JsonResponse({
+                        "allowed": False,
+                        "message": (
+                            f"📛 Siz hali testni boshlash uchun yetarlicha odamni guruhga qo‘shmagansiz.\n\n"
+                            f"🔗 Iltimos, quyidagi guruhga <b>{required - actual_referrals}</b> nafar foydalanuvchini qo‘shing:"
+                        ),
+                        "group_link": group_link
+                    })
+                print("assalomu alaykum")
+                user.diagnostikas.add(diagnostika)
+
+            subjects = Subject.objects.filter(
+                id__in=DiagnostikaSubjectAssociation.objects.filter(
+                    diagnostika_id=diagnostika_id
+                ).values_list("subject_id", flat=True)
+            ).values("id", "name")
+
+            return JsonResponse({
+                "allowed": True,
+                "subjects": list(subjects)
+            })
+
+        except Exception as e:
+            print(f"❌ Xatolik yuz berdi: {str(e)}")  # yoki logging
+            return JsonResponse({"error": f"Ichki server xatosi: {str(e)}"}, status=500)
 
 class TestAnalysisAPIView(APIView):
     def get(self, request):

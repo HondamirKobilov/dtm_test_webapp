@@ -13,7 +13,7 @@ class User(models.Model):
     username = models.CharField(max_length=255, unique=True, null=True, blank=True)
     is_blocked = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
-    share_value = models.CharField(max_length=255, null=True, blank=True)
+    referral_count = models.IntegerField(null=False, default=0)
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 
@@ -24,6 +24,17 @@ class User(models.Model):
     def __str__(self):
         return self.fullname if self.fullname else f"User {self.user_id}"
 
+
+class ReferralCount(models.Model):
+    id = models.BigAutoField(primary_key=True)  # ✅ id ustuni (optional, Django defaultda baribir yaratadi)
+    count = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'ref_count'  # PostgreSQL yoki boshqa DB'dagi jadval nomi
+        managed = False         # Jadvalni Django o'zi yaratmaydi
+
+    def __str__(self):
+        return f"Umumiy referal soni: {self.count}"
 
 class Diagnostika(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -137,3 +148,30 @@ class DiagnostikaSubjectAssociation(models.Model):
 
     def __str__(self):
         return f"{self.diagnostika.name} - {self.subject.name}"
+
+class Group(models.Model):
+    id = models.AutoField(primary_key=True)
+    chat_id = models.BigIntegerField(unique=True)
+    username = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = "groups"
+        managed = False
+
+    def __str__(self):
+        return f"{self.title} (@{self.username})"
+
+class ReferralHistory(models.Model):
+    id = models.BigAutoField(primary_key=True)     # Majburiy emas, lekin aniqlik uchun yozdik
+    inviter_id = models.BigIntegerField()
+    invited_id = models.BigIntegerField()
+    diagnostika_id = models.BigIntegerField()
+
+    class Meta:
+        db_table = 'referral_history'
+        unique_together = ('inviter_id', 'invited_id', 'diagnostika_id')
+        managed = False
+
+    def __str__(self):
+        return f"{self.inviter_id} ➜ {self.invited_id} (Diagnostika: {self.diagnostika_id})"

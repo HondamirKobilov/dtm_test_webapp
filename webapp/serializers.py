@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Diagnostika, Answer, Question
+from .models import Diagnostika, Answer, Question, ReferralCount
 
 
 class DiagnostikaSerializer(serializers.ModelSerializer):
@@ -23,3 +23,8 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ['id', 'question_text', 'image', 'answers']
+
+class ReferralCountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReferralCount
+        fields = ['count']

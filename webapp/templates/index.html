@@ -71,7 +71,6 @@
     <main class="container hidden" id="test-container">
         <!-- ✅ Bosh sahifaga qaytish tugmasi (test tahlili boshlanganida chiqadi) -->
         <button id="backToHomeTop" class="back-btn hidden">⬅️ Bosh sahifaga qaytish</button>
-    
         <div class="test-content">
             <!-- ✅ Chap tomondagi savollar qismi -->
             <div id="questions-container">
@@ -210,9 +209,16 @@
             </thead>
             <tbody id="resultsBody"></tbody>
         </table>
-        
+    </div>
+    <div id="referralModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="referral-message"></p>
+        <button id="join-group-btn">👥 Guruhga qo‘shilish</button>
+      </div>
     </div>
     <div id="questionsDiv"></div>
+    
     <script src="{% url 'js' %}"></script>
 </body>
 </html>
