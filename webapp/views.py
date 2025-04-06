@@ -276,7 +276,7 @@ class CheckAnswersAPIView(APIView):
 
         except Exception as e:
             return Response({"status": "error", "message": str(e)}, status=500)
-
+# Test boshlanishi
 class CheckDiagnostikaSubjectsAPIView(APIView):
     def get(self, request):
         try:
